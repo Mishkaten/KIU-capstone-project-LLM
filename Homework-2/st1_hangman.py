@@ -118,6 +118,7 @@ def valid(input_char):
 
 def play():
     word = get_word()
+    print(word)
     word_display = ['_' for _ in word]
     guessed = set()
     lives = 6
