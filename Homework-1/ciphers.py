@@ -1,74 +1,36 @@
-def encryptAtbashCipher(plain_text):
-    result = ''
-    for char in plain_text:
-        if char.isalpha():
-            result += chr(219 - ord(char)) if char.islower() else chr(155 - ord(char))
-    return result
 
-def decryptAtbashCipher(encrypted_text):
-    # Since Atbash cipher is symmetric, encryption and decryption processes are the same.
-    return encryptAtbashCipher(encrypted_text)
+# Easy
+def encryptAtbashCipher(text):
+    pass
 
-def encryptCaesarCipher(plain_text, key):
-    result = ''
-    for char in plain_text:
-        if char.isalpha():
-            shift = 65 if char.isupper() else 97
-            result += chr((ord(char) - shift + key) % 26 + shift)
-        elif char in char_map:
-            result += char_map[char]
-        else:
-            result += char
-    return result
+# Easy
+def decryptAtbashCipher(text):
+    pass
 
-def decryptCaesarCipher(encrypted_text, key):
-    return encryptCaesarCipher(encrypted_text, -key)
+# Easy
+def encryptCaesarCipher(text, key):
+    pass
 
-char_map = {
-    '.': ',', ',': '.', '!': '?', '?': '!', 
-    '0': '1', '1': '0', '2': '3', '3': '2', 
-    '4': '5', '5': '4', '6': '7', '7': '6', 
-    '8': '9', '9': '8'
-}
+# Easy
+def decryptCaesarCipher(text, key):
+    pass
 
-def encryptVigenereCipher(plain_text, keys):
-    result = ''
-    for i, char in enumerate(plain_text):
-        if char.isalpha():
-            shift = 65 if char.isupper() else 97
-            key = keys[i % len(keys)]
-            result += chr((ord(char) - shift + key) % 26 + shift)
-        elif char in char_map:
-            result += char_map[char]
-        else:
-            result += char
-    return result
+# Medium
+def encryptVigenereCipher(text, keyList):
+    pass
 
-def decryptVigenereCipher(encrypted_text, keys):
-    return encryptVigenereCipher(encrypted_text, [-k for k in keys])
+# Medium
+def decryptVigenereCipher(text, keyList):
+    pass
 
-def encryptSimpleEnigmaCipher(plain_text, keys):
-    result = ''
-    for i, char in enumerate(plain_text):
-        transformed_char = char
-        if char.isalpha():
-            for key in keys:
-                shift = 65 if char.isupper() else 97
-                transformed_char = key[ord(transformed_char) - shift]
-        result += transformed_char
-    return result
+# Medium
+def encryptSimpleEnigmaCipher(text, keys):
+    pass
 
-def decryptSimpleEnigmaCipher(encrypted_text, keys):
-    reverse_keys = [{v: k for k, v in enumerate(key)} for key in keys[::-1]]
-    result = ''
-    for i, char in enumerate(encrypted_text):
-        transformed_char = char
-        if char.isalpha():
-            for key in reverse_keys:
-                shift = 65 if char.isupper() else 97
-                transformed_char = chr(key[transformed_char] + shift)
-        result += transformed_char
-    return result
+# Hard
+def decryptSimpleEnigmaCipher(text, keys):
+    pass
+
 
 
 """ 

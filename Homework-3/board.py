@@ -1,26 +1,22 @@
+from pieces import *
+
 class Board:
+
     def __init__(self):
-        self.pieces = {}
-        self.placePieces()
+        pass
 
     def placePieces(self):
-        # Initial placement of pieces at game start
         pass
 
     def setPiece(self, position, piece):
-        self.pieces[position] = piece
+        pass
 
     def getPiece(self, position):
-        return self.pieces.get(position, None)
+        pass
 
-    def makeMove(self, start, end):
-        piece = self.getPiece(start)
-        if piece and piece.move(end):
-            self.setPiece(end, piece)
-            self.setPiece(start, None)
-            return True
-        return False
+    def makeMove(self, startPosition, endPosition, player):
+        pass
 
     def displayBoard(self):
-        # Print board state
         pass
+
