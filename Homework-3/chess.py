@@ -1,21 +1,26 @@
-from board import Board
-from pieces import *
-
 class Chess:
     def __init__(self):
-        pass
+        self.board = Board()
+        self.currentPlayer = "White"
 
     def swapPlayers(self):
-        pass
-    
-    def isStringValidMove(self, moveStr):
-        pass
+        self.currentPlayer = "Black" if self.currentPlayer == "White" else "White"
+
+    def isStringValidMove(self, move):
+        # Validate move format
+        return True
 
     def play(self):
-        pass
-
-if __name__ == "__main__":
-    game = Chess()
-    game.play() 
-
-
+        while True:
+            self.board.displayBoard()
+            print(f"{self.currentPlayer}'s turn. Enter a move:")
+            move = input()
+            if move.lower() == "exit":
+                break
+            if not self.isStringValidMove(move):
+                continue
+            start, end = move.split()
+            if not self.board.makeMove(start, end):
+                print("Invalid move, try again.")
+                continue
+            self.swapPlayers()
