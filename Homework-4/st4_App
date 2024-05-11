@@ -1,0 +1,125 @@
+import pygame
+import random
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
+CELL_SIZE = 20
+WHITE = (255, 255, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+FPS = 10
+
+# Set up the display
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Snake Game")
+clock = pygame.time.Clock()
+
+# Helper functions
+def draw_block(color, row, col):
+    pygame.draw.rect(screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+class Snake:
+    def __init__(self):
+        self.length = 5
+        self.positions = [(SCREEN_WIDTH // 2 // CELL_SIZE, SCREEN_HEIGHT // 2 // CELL_SIZE + i) for i in range(self.length)]
+        self.direction = 'RIGHT'
+        self.color = GREEN
+
+    def draw(self):
+        for position in self.positions:
+            draw_block(self.color, position[1], position[0])
+
+    def move(self):
+        head_x, head_y = self.positions[0]
+        if self.direction == 'UP':
+            head_y -= 1
+        elif self.direction == 'DOWN':
+            head_y += 1
+        elif self.direction == 'LEFT':
+            head_x -= 1
+        elif self.direction == 'RIGHT':
+            head_x += 1
+        new_head_pos = (head_x, head_y)
+        
+        # Check for self-collision
+        if new_head_pos in self.positions:
+            return False
+        
+        # Check for wall collision
+        if head_x < 0 or head_x >= SCREEN_WIDTH // CELL_SIZE or head_y < 0 or head_y >= SCREEN_HEIGHT // CELL_SIZE:
+            return False
+
+        self.positions.insert(0, new_head_pos)
+        self.positions.pop()
+        return True
+
+    def grow(self):
+        head_x, head_y = self.positions[0]
+        if self.direction == 'UP':
+            head_y -= 1
+        elif self.direction == 'DOWN':
+            head_y += 1
+        elif self.direction == 'LEFT':
+            head_x -= 1
+        elif self.direction == 'RIGHT':
+            head_x += 1
+        self.positions.insert(0, (head_x, head_y))
+
+    def change_direction(self, new_dir):
+        """Change the direction of the snake unless it's a 180 degree turn."""
+        opposite_directions = {'UP': 'DOWN', 'DOWN': 'UP', 'LEFT': 'RIGHT', 'RIGHT': 'LEFT'}
+        if new_dir != opposite_directions[self.direction]:
+            self.direction = new_dir
+
+class Food:
+    def __init__(self):
+        self.position = (random.randint(0, (SCREEN_WIDTH // CELL_SIZE) - 1), random.randint(0, (SCREEN_HEIGHT // CELL_SIZE) - 1))
+        self.color = RED
+
+    def draw(self):
+        draw_block(self.color, self.position[1], self.position[0])
+
+    def relocate(self):
+        self.position = (random.randint(0, (SCREEN_WIDTH // CELL_SIZE) - 1), random.randint(0, (SCREEN_HEIGHT // CELL_SIZE) - 1))
+
+def main():
+    snake = Snake()
+    food = Food()
+    
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    snake.change_direction('UP')
+                elif event.key == pygame.K_DOWN:
+                    snake.change_direction('DOWN')
+                elif event.key == pygame.K_LEFT:
+                    snake.change_direction('LEFT')
+                elif event.key == pygame.K_RIGHT:
+                    snake.change_direction('RIGHT')
+
+        screen.fill((0, 0, 0))  # Clear the screen
+        snake.draw()
+        food.draw()
+
+        if snake.move() is False:
+            print("Game over!")
+            running = False
+
+        if snake.positions[0] == food.position:
+            snake.grow()
+            food.relocate()
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+    pygame.quit()
+
+if __name__ == '__main__':
+    main()
