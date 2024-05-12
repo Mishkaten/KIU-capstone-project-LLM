@@ -1,0 +1,94 @@
+Colors
+
+For this assignment you are only permitted to use classes and methods from the package java.lang (no further imports are allowed) beyond what we provide to you in the git repository.
+
+For the representation and storage of pictures (of penguins) digital devices require a possibility to specify colors. Most common is to decompose a color into its additive components: Red, Green and Blue (RGB). The intensities of the components must be stored onto the device as numbers. This may happen with a specific precision, since we can refer to finite ranges of values only. For that purpose, we provide appropriate classes for particular precisions.
+
+Important Hints:
+
+All objects of all classes from this assignment should be immutable. This means that their object states, once initialized must not be changed, neither via methods of the class nor other accesses from the outside. You can easily achieve this by qualifying each object attribute as final.
+
+At some places, a validity check is required together with a dedicated treatment of exceptional cases. For that you may use the method unsupportedOperation(String) from the class ExcetionUtil of the template for breaking and terminating the method's or the constructor's execution in these cases. In these cases, we want to receice an error message; so, do not be surprised to see these. Accordingly, call that method at appropriate places (invalid value/state) together with a meaningful message.
+
+Hide the implementation details of your classes: Mark all attributes as private. If you write auxilary methods, mark these as private as well - besides that the assignment's spec asks you for something different.
+
+You may very well use the static method powerOfTwo of class IntMath for calculating the required powers of 2 from the assignment.
+
+In your implementation take care that the public test cases only check the existence of classes, methods etc. What exactly is tested, is specified at each test case or Artemis task. Please test the functionality of your code extensively yourself.
+
+Take also care that your code is properly formated and pleasant to read.
+
+The goal ist to realize three new classes:
+
+Implement a class RgbColor. 5 of 5 tests passing
+
+This class represents the following values:
+
+Red component as an int value, to be accessed via the public method getRed()
+
+Green component as an int value, to be accessed via the public method getGreen()
+
+Blue component as an int value, to be accessed via the public method getBlue()
+
+The color depth or bit depth as int value, which limits the number of different intensities of red, green or blue are provided or, more precisely, how many bits are provided for storing the given colors.
+Thereby, the values for the color components must be checked for validity. Valid values range from 0…(2bitDepth−1)0…(2bitDepth−1). Also, the color depth itself must be checked for validity. Here, we restrict ourselves to non-negative int values and thus only allow color depths up to 31 bits. In your computations, please take into account that 231231 itself is not representable as an int value and design the logic of your implementation accordingly. Colors up to bit depth of 31 should work without restriction. Color deths of 0 or less are not meaningful and thus should not be allowed.
+The color depth should be accessible via the public method getBitDepth.
+
+The constructor of the class should be public and of the form:
+RgbColor(int bitDepth, int red, int green, int blue)
+
+The test here is with new RgbColor(1, 1, 1, 1).
+
+Implement the class RgbaColor. 6 of 6 tests passing
+
+This class represents colors which differ in their transparency (so that, e.g., penguins painted over, remain visible). This class should be a sub-class of the class RgbColor, but add another attribute for
+
+the alpha component of the color, encoded as an int.
+The alpha component of a color specifies how transparent the color is (smaller values correspond to greater transparency; with maximal alpha component the color is intransparent). The validity check for the alpha component is analogous to the corresponding checks for red, green and blue.
+Provide a public method getAlpha() for accessing the alpha component.
+
+The constructor of the class is public and of the following form:
+RgbaColor(int bitDepth, int red, int green, int blue, int alpha)
+
+The test here is with new RgbaColor(1, 1, 1, 1, 1).
+
+Implement a class RgbColor8Bit. 5 of 5 tests passing
+
+This class inherits from RgbColor as well, fixes, however, the color depth to 8. The reason for that specialization is that colors with 8 bit are so popular that we want to omit the extra parameter 8 at object creation.
+
+The constructor of the class is public and of the following form:
+RgbColor8Bit(int red, int green, int blue)
+
+The test here is with new RgbColor8Bit(8, 8, 8).
+
+Conversion into RgbColor8Bit 3 of 3 tests passing
+
+Since 8 bit color depth is so popular, we want to provide a method which converts colors into 8 bit colors. For that, all three classes must be enriched by a public method toRgbColor8Bit() which returns an RgbColor8Bit object:
+
+Implement this method for the class RgbColor such that an arbitrary RGB color is converted into an 8 bit RGB.
+Thereby, you may proceed as follows:
+
+If the color depth is already 8 bit, the component values must only be passed to the newly created RgbColor8Bit object.
+
+If the color depth is greater than 8 bit, then the component values must be reduced to the 8 bit range. You may achieve this by dividing by 2 to the power of the difference of the color depths; we insist, however, also on correct rounding (i.e., not always downwards, but also upward if necessary). In order to achieve this, you may proceed as follows: We first divide only by 2𝐷𝑖𝑓𝑓𝑒𝑟𝑒𝑛𝑐𝑒−12Difference−1. From that value, we record the very last bit (calculation modulo 2 could be helpful). The value then is divided by the delayed factor 2. To the result, finally, the recorded bit is added (if 0: no change, rounding downward; if 1: rounding upward). Only take care that the result may not exceed the maximal valid value for 8 bit color depth. If that is going to happen, the result should just be the maximally allowed value.
+
+If the color depth is less than 8 bit, then the component values must be scaled up, i.e., be multiplied by an appropriate power of 2. As is, this would have the disadvantage that the 2 bit component value 11 (3 in decimal) would, e.g., be scaled into 11000000 (192 in dezimal), although it represents the maximal value (11111111 or 255 in decimal). For that reason, we do not just fill up with 0, but repeat the original value as often as possible. In this way, 10 (2 in decimal) becomes 10_10_10_10 (170 in decimal) or 011 (3 in decimal) is turned into 011_011_01 (109 in decimal; the last 1 is not used for filling the 8 positions). Realize this procedure. You may repeatedly multiply with powers of 2 before adding the given value. At the end, you perhaps may need to adapt the result dividing by with factors of 2 appropriately (as in the example 011 into 011_011_01). The difference of plain multiplication with an appropriate power of 2 and the technique described here, can nicely be illustrated with the class DisplayColor by testing both with a color such as new RgbColor(2, 3, 0, 0).
+Hint: The sequences in 0 and 1 are in binary, i.e., each position corresponds to a power of 2 analogously as in the decimal system. Under-scores only serve as visual separators. By division with 2, all digits are shifted right by 1, while by multiplication with 2, all are shifted left by 1. At an int division, rounding is always towards 0 (3/2 == 1).
+
+Suggestion: auxiliary methods may be convenient here.
+
+Over-write this method in the class RgbColor8Bit so that the RgbColor8Bit object itself is returned. By that, - Over-write this method in the class RgbaColor so that this method behaves as follows:
+
+If the alpha value not maximal, (i.e., equals the maximal valid value), the method the method should be terminated with an error by means of the ExceptionUtil-unsupportedOperation , together with a useful error message.
+
+If the alpha value is maximal, the RgbaColor should be converted to an 8 Bit RGB without problems. For that, call the appropriate method of the super-class. Try to avoid code duplication (viy copy'n'paste) by all means!
+
+The tests above only test whether any RgbColor8Bit object is returned (together with what the implementation is tested for). Here come two more tests which should help to avoid cross programming errors:
+
+Scaling up and filling 0 of 1 tests passing
+
+conversion of new RgbColor(3, 0b011, 0b000, 0b001)
+
+Scaling down and rounding 1 of 1 tests passing
+
+conversion of new RgbColor(10, 0b00_1111_1111, 0b00_0000_0000, 0b00_1010_0001)
