@@ -1,5 +1,5 @@
 import unittest
-from st2_elist import DLNode, UIDGenerator, EvilList
+from st4_elist import *
 
 class TestUIDGenerator(unittest.TestCase):
 

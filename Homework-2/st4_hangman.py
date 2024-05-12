@@ -115,6 +115,7 @@ def valid(input_char):
 
 def play():
     word = get_word()
+    print(word)
     guessed = ['_' for _ in word]
     guessed_correctly = set()
     guessed_letters = set()

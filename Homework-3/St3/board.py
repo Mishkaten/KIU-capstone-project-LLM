@@ -1,4 +1,6 @@
 # board.py
+from pieces import *
+
 class Board:
     def __init__(self):
         self.pieces = {}  # dictionary to hold pieces by their position
