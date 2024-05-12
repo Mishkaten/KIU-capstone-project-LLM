@@ -1,0 +1,41 @@
+Searching Files
+
+In this assignment, you are meant to search all text files in a directory (as well as its subdirectories) for specific strings. For that, realize the following methods of the class FileSearch.
+
+searchFile 1 of 1 tests passing
+
+Implement a method Result searchFile(Path file, String[] searched). This method receives as parameter a path file together with an array of strings searched for which the content of file with path file should be searched. You may assume that the strings in searched do not contain line breaks and that path file refers to a regular file; in particular, both arguments are non-null. The method is should return a Result object summarizing information about the search in file file. (The constructor of Result expects an appropriate parameter of type Path which specifies for which file the object is valid.) For every line in which at least one of the specified strings occur, the Result should receive a Match decribing the line. Addition to the Result object should happen via the method addMatch(Match match). A Match object has attributes int lineIndex (line numbers are indexed starting with 0) and String line, i.e., line number and content of the respective line. Each line should be added to the Result object at most once - even if multiple strings from searched may match. The lines should occur in Result in the order of their occurrence in the file. If no line of the file is matched, a Result object without matches should be returned. In case that an exception occurs, null should be returned.
+
+searchDirectory 1 of 1 tests passing
+
+Implement a method Set<Result> searchDirectory(Path directory, String searched[]). This method is meant to search all regular files in the directory directory as well as all its direct and indirect sub-directories with the method searchFile and return the set of respective non-null results in an object of type Set<Result>. Whenever an IOException occurs, the program should provide a meaningful error handling, including the output of an appropriate error message on the console.
+
+listResults 0 of 1 tests passing
+
+Implement a method List<Result> listResults(String directory, String searched[]). This method returns a sorted list of the Results provided by searchDirectory so that the results for files with more matches occur before files with less matches. The arguments are again assumed to be non-null.
+
+main 0 of 1 tests passing
+
+Implement a main method which calls listResults and then prints the results in the corresponding order to the console. The first command line argument of the program should be the directory directory to be searched, whicl the succeeding command line arguments are the strings to be searched for. For outputting the results, use toString from the class Result which is already implemented. Each result should be terminated with a line break.
+
+An example run is shown in the example below. If less than two command line arguments are provided, the program should immediately terminate with a meaningful error message. Example:
+
+>java fop.w10search.FileSearch /path/to/directory/A Hallo
+1 match in file /path/to/directory/A/b.txt.
+Match in line 1: Hallo!
+No match in file /path/to/directory/A/C/d.txt
+
+
+Explanation of the Example: The character > indicates a call from the console. The subsequent lines are the output of an example run of the program; the directory path in which the program searches corresponds to the command line argument. That path must exist for the program to work properly. In the example execution above, the file /path/to/directory/A/b.txt has in line 1 the text "Hallo! " (without quotation marks), the other regular file within the searched directory (/path/to/directory/A/C/d.txt) has no line matching "Hallo!".
+
+Hints:
+
+For this assignment, the class Files could be of use.
+
+By means of [walk](https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/nio/file/ Files.html#walk(java.nio.file.Path,java.nio.file.FileVisitOption...)), a Stream object for the elements of the directory tree below a given path can be created.
+
+By means of [isRegularFile](https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/ nio/file/Files.html#isRegularFile(java.nio.file.Path,java.nio.file.LinkOption...)), it can be checked whether a given path identifies a regular file.
+
+By means of isDirectory it can be checked whether a path identifies a directory.
+
+You may assume that all regular files in the searched directory are text files in UTF-8 format.
