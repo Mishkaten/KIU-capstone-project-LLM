@@ -1,0 +1,245 @@
+Pick Six
+
+This assignment is meant to realize a variant of the card game "Pick Six" by means of array. You first implement certain methods which you then may use for realizing whols plays.
+
+Hints
+
+The only non-trivial data-types to be used are String and arrays of String and as imports only packages from java.lang.*.
+
+Implementation of auxiliary methods is permitted and may even be helpful.
+
+Methods
+
+Implement the following methods. The respective method signatures from the template may not be changed. Each method comes with its own tests so that they may be implemented independently.
+
+Drawing Cards 1 of 1 tests passing
+
+The method givePlayerCards(int[][] playerCards) receives an arbitrary 2-dim. array and fills it succesively with the values provided by the calls to int drawCard() from MiniJava. The return values of drawCard() are between 1 and 105 (including these values). The first dimension of the array indexes the batches, while the second refers to the cards in the batch. First, draw cards for the first batch (index 0) from left to right in the array, then the next one and so on. It is important that each drawn card is also assigned.
+
+Example: The assignment into a 2x2 array for the random sequence 1, 2, 3, 4 is:
+
+arr[0][0] = 1;
+arr[0][1] = 2;
+arr[1][0] = 3;
+arr[1][1] = 4;
+
+
+Calculating Card Values 1 of 1 tests passing
+
+The method int getValueOfCard(int card) computes the value of an individual card. Each card is worth at least 1 point. If it ends with a 5, it is worth another point. If it ends with a 0, it is worth 2 further points. If it is a repdigit (at least two digits, all digits the same), it receives 5 additional points. If the actual parameter is 0, it denotes "no card". In that case, the return value should be again 0.
+
+Example: The value of 25 is 1+1 = 2; whereas the value of 55 is 1+1+5 = 7.
+
+Calculating all Values of an Array 1 of 1 tests passing
+
+The method public static int calculatePoints(int[] lostCards) calculates the sum of values of all cards of a player by means of the method getValueOfCard(). The cards are provided by means of an array of arbitrary length. The values in the array are in the range of 0 to 105. An occurrence of a value 0 in the array represents absence of the corresponding card.
+
+Output of the Batches of Cards 1 of 2 tests passing
+
+The method void outputBatch(int[][] batch) outputs the given 2-dim. array on the console. The first dimension indexes the batches, while the second indexes the cards in a batch. The output is canceled as soon as a value <= 0 is encountered.
+
+The 2-dim. array:
+{{1, 2, 3, 4, 5},
+{6, 7, 8, 9, 10},
+{11, 12, 13, 14, 15},
+{16, 17, 18, 19, 20}}
+is output as follows:
+
+Batch 1: 1 2 3 4 5
+Batch 2: 6 7 8 9 10
+Batch 3: 11 12 13 14 15
+Batch 4: 16 17 18 19 20
+
+
+The 2-dim. array:
+{{3, 2, 1, 0, -1},
+{8, 7, 6, 5, 4},
+{13, 12, 11, 10, 9},
+{18, 17, 16, 15, 14}}
+is output as follows:
+
+Batch 1: 3 2 1
+Batch 2: 8 7 6 5 4
+Batch 3: 13 12 11 10 9
+Batch 4: 18 17 16 15 14
+
+
+Output the the Result of the Play 1 of 1 tests passing
+
+The method public static void outputResult(int[] playerPoints)receives an array with two values, corresponding to players 1 and 2. The method prints the result of the play onto the console. The player with less points wins. The format of the output (for arbitrary values) is as follows:
+
+Player 2 wins with 72 points against player 1 with 102 points.
+
+
+Spieler 1 wins with 72 points against player 2 with 102 points.
+
+
+Draw! Both players have 42 points.
+
+
+Selection of Card to Play 2 of 2 tests passing
+
+The method int playerSelectCard(int player, int[][] playerCards) receives as parameter the player together with all cards. The method asks the player on the console which card to play, returns this value and sets the first card in the player's hand with this value to 0. If the player enters a value which she does not possess, the request for input is repeated. The input/output in an example run for player 1 may look as follows:
+
+Player 1, you have the following cards: 56 24 104 29 86 98 99 19 73 87 
+Which card do you want to play?
+>20
+Player 1, you have the following cards: 56 24 104 29 86 98 99 19 73 87 
+Which card do you want to play?
+>1
+Player 1, you have the following cards: 56 24 104 29 86 98 99 19 73 87 
+Which card do you want to play?
+>24
+
+
+(The character > precedes user input and is neither part of the program input nor part of the program output)
+
+Playing the Game
+
+You now have realized a variety of auxiliary functions which should help to realize the play in a structured way.
+
+Preparation of the Play
+
+Both players receive 10 cards by means of the method givePlayerCards.
+
+Four batches are filled in sequence with a single card each.
+
+Loop of the Play
+
+Each play has 10 rounds. Each round is prganized as follows:
+
+Player 1 selects a card to play. This has already been implemented by means of the method playerSelectCard.
+
+Player 2 selects a card to play. This has already been implemented by means of the method playerSelectCard.
+
+The played cards are in increasing order distributed over the batches according to the following rules (examples see below):
+
+The cards of each batch must form an increasing sequence.
+
+A card must be put onto the batch whose topmost card has the least difference to the new card.
+
+A batch with 5 cards is full. If, according to rules 1+2, a player's card would have been assigned to a full batch, this new card becomes the initial card of the batch, while all 5 former cards go back to the player who played the card.
+
+Who played a card whose number is too small that it does not fit onto any batch, must take all cards from the first batch. The played card then becomes the first card of the new first batch.
+
+End of a Play
+
+After t0 rounds, the players' points are calculated. For that, you have provided the method calculatePoints. Subsequently, the result of the play is output. For that, you have provided the method outputResult.
+
+Implementation of the Game Logic
+
+Upto now, you should have realized a variety of useful methods. The playing loop is so far only partly implements, and it is your task to realize it completely. Here, you may develop your own implementation strategy.
+
+Also make sure whether additionally to the mentioned variables, you might want to introduce further variables for storing extra information.
+
+Play from Beginning to End (Example Run) 0 of 1 tests passing
+
+Example Run
+
+Batch 1: 7
+Batch 2: 54
+Batch 3: 72
+Batch 4: 76
+Player 1, you have the following cards: 76 17 65 27 100 28 6 30 68 70
+Which card do you want to play?
+>76
+Player 2, you have the followin cards: 72 13 5 2 10 50 77 42 44 88
+Which card do you want to play?
+>72
+Batch 1: 7
+Batch 2: 76 72 54
+Batch 3: 72
+Batch 4: 76
+Player 1, you have the following cards: 17 65 27 100 28 6 30 68 70
+Which card do you want to play?
+>6
+Player 2, you have the following cards: 13 5 2 10 50 77 42 44 88
+Which card do you want to play?
+>2
+Batch 1: 6 2
+Batch 2: 76 72 54
+Batch 3: 72
+Batch 4: 76
+Player 1, you have the following cards: 17 65 27 100 28 30 68 70
+Which card do you want to play?
+>100
+Player 2, you have the following cards: 13 5 10 50 77 42 44 88
+Which card do you want to play?
+>5
+Batch 1: 5
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 76
+Player 1, you have the following cards: 17 65 27 28 30 68 70
+Which card do you want to play?
+>65
+Player 2, you have the following cards: 13 10 50 77 42 44 88
+Which card do you want to play?
+>11
+Player 2, you have the following cards: 13 10 50 77 42 44 88
+Which card do you want to play?
+>13
+Batch 1: 65 13 5
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 76
+Player 1, you have the following cards: 17 27 28 30 68 70
+Which card do you want to play?
+>68
+Player 2, you have the following cards: 10 50 77 42 44 88
+Which card do you want to play?
+>77
+Batch 1: 68 65 13 5
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 77 76
+Player 1, you have the following cards: 17 27 28 30 70
+Which card do you want to play?
+>70
+Player 2, you have the following cards: 10 50 42 44 88
+Which card do you want to play?
+>88
+Batch 1: 70 68 65 13 5
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 88 77 76
+Player 1, you have the following cards: 17 27 28 30
+Which card do you want to play?
+>30
+Player 2, you have the following cards: 10 50 42 44
+Which card do you want to play?
+>50
+Batch 1: 50 30
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 88 77 76
+Player 1, you have the following cards: 17 27 28
+Which card do you want to play?
+>17
+Player 2, you have the following cards: 10 42 44
+Which card do you want to play?
+>42
+Batch 1: 42 17
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 88 77 76
+Player 1, you have the following cards: 27 28
+Which card do you want to play?
+>27
+Player 2, you have the following cards: 10 44
+Which card do you want to play?
+>10
+Batch 1: 27 10
+Batch 2: 100 76 72 54
+Batch 3: 72
+Batch 4: 88 77 76
+Player 1, you have the following cards: 28
+Which card do you want to play?
+>28
+Player 2, you have the following cards: 44
+Which card do you want to play?
+>44
+Player 2 wins with 5 against player 1 with 15 points.
+
+
+Hint: Lines with user input are preceded by >. This character is not part of program input or output.
