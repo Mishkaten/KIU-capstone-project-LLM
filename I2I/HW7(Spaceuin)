@@ -1,0 +1,95 @@
+Penguins in Space
+
+Pingu (a so-called Spaceuin) travels through outer space. It so happened that her space ship was attacked by some space ice bear. Accordingly, she has to return to her base in order to prepare for a counter strike.
+
+For that, she must travel through a space where there are multiple Beacons. Each of these is connected to other Beacons. A Beacon has a unique name and a list of connections. The connections are represented by BeaconConnections which contain the target Beacon together the type of connection. Self-loops, i.e., connections returning to their sources and "dead ends" (no outgoing connections) are possible!
+
+Besides the normal type of connections (NORMAL) there are also worm holes identified as WORMHOLE. Traversing these, creates a clone of Pingu (a new thread) in a parallel universe at the target beacon of the wormhole whild the original Pingu remains at her point and thus may search for another path. There are limitations to the usage of parallel universes, though, which forbid that two copies of Pingu may co-exist at the same beacon at the same point in time (two realities then collided and would wreck all of Physics).
+Concerning connections via wormholes, Pingu has no choice: when she visits that beacon for the first time, she eagerly searches through all out-going connections to beacons not yet visited, to use each wormhole connection for a duplication. Only then she continues her search via normal connections.
+For Pingu not to travel in circles, each Pingu must record where she has already been. A fresh clone of Pingu, though, has lost all memory about already visited places.
+
+If Pingu ends up in a dead end, she may go back one step and choose another path. If none of the out-going paths lead to the base, she back-tracks yet another step (and so on). If there are no further paths, this Pingu's travel comes to an end.
+
+As soon as (some clone of) Pingu has reached the base, all Pingus may stop searching: the star fleet is equipped with a dedicated radio device by which it can communicate with parallel universes, and all Pingu copies are saved.
+
+Pingu's travel is recorded by some historiographic device (FlightRecorder) of her spacecraft which is provided in the constructor. This device always records by means of recordArrival the Beacon after Pingu has arrived or has returned there, and by means of recordDeparture the current Beacon immediately before it is left by Pingu. If Pingu is coped into a parallel universe, the FlightRecorder is copied as well - but may depend on the type of the device. Accordingly, please use the method createCopy in order to create the copy and use its result for the copied Pingu.
+
+If the target Beacon (the base) is found, Pingu reports about her travel by means of her FlightRecorder. For that, call the method tellStory as soon as the target base has been reached. Since the target is only reached by one Pingu first, tellStory must be called at most for one Pingu.
+
+Extend the implementation of the class Spaceuin in order to realize the outlined behavior.
+
+The types Beacon, BeaconConnection, Space, ConnectionType, FlightRecorder and SimpleFlightRecorder all are already provided. Please do not touch this code. Only the method main from class Space and SimpleFlightRecorder may be appropriately adapted for experimentation. Otherwise, it may happen that your solution cannot be tested and graded.
+
+Also, the constructor from Spaceuin as provided in the template must be present and working, and Pingu's travel must be startable by means of a call to the method start().
+
+Take care that all your threads/Spaceuins are terminated in the end when the target has been reached; if there are timeouts, deadlocks or missing calls of tellStory are the most likely reasons. For coordination, Thread.interrupt() as well as Thread.isInterrupted() may be helpful.
+
+During your travel through space, please explore connections in the order in which they occur in the respective List<BeaconConnection>s and proceed to the next connection only when the preceeding one was not successful (this is also called depth-first search).
+
+For this assignment, the package java.util.concurrent is not permitted.
+
+Graphical representation of the connections from the example (also in method main of Space, only for orientation):
+
+Tests
+
+The public tests test the data recorded by the Flight Recorder in a particular format:
+
+->XYZ marks the arrival at "XYZ" (recordArrival)
+
+XYZ-> marks the departure of "XYZ" (recordDeparture)
+
+| separates individual actions
+
+At connections via wormholes, the copy does not record departure, but just arrival at the endpoint beacon. See also the first example.
+
+A Simple Example
+
+We only have three beacons, namely, A, B and C.
+From C to B and from C to C exists ein normal connection, from A to C a wormhole connection. Spaceuin Pingu wants to travel from A to B.
+
+The expected path therefore is ->A|->C|C->|->B, i.e., arrival at A, arrival at C, departure of C and finally arrival at B.
+The output of the simple method tellStory is:
+
+I was at beacon A
+I was at beacon C
+I was at beacon B
+
+
+Test for the simple Example 0 of 1 tests passing
+
+Hint: Due to the complexity of testing of synchronization and concurrency, it may come to strange error messages of the automatic tests in Artemis. Therefore, use the main method and first test everything offline yourself.
+
+1. Output of tellStory (more frequently)
+
+I was at beacon Alpha
+I was at beacon Beta
+I was at beacon Gamma
+I was at beacon Alpha
+I was at beacon Beta
+I was at beacon Delta
+I was at beacon Beta
+I was at beacon Alpha
+I was at beacon Gamma
+I was at beacon Epsilon
+
+
+Test dedicated to variant 1 1 of 1 tests passing
+
+2. Output of tellStory (less frequently)
+
+I was at beacon Alpha
+I was at beacon Beta
+I was at beacon Delta
+I was at beacon Gamma
+I was at beacon Alpha
+I was at beacon Beta
+I was at beacon Delta
+I was at beacon Beta
+I was at beacon Alpha
+I was at beacon Gamma
+I was at beacon Epsilon
+
+
+Test dedicated to variant 2 1 of 1 tests passing
+
+(We test here with a slightly modified flight recorder in order to test both variants in a safe way - but don't worry! This does not affect Pingu)
