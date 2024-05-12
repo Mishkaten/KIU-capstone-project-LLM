@@ -1,0 +1,15 @@
+Mystic Creatures of the Wild
+
+Draw a (simple) model of beast inheritance (in UML). This should provide genera of (mystic) creatures with the following abilites/activities:
+
+NameabilityPenguin   eatPigeoneat, flyDragoneat, fly, breathFireMonstereat, breathFire
+
+Common abilities of several genera should in the model be represented by common super- classes or interfaces and specified there with appropriate methods.
+
+Implement the classes of your model, first without default methods. Name all classes by using the prefix Simple (e.g., SimplePenguin).
+
+The methods should only produce text outout (e.g., Penguin eats., Dragon flies.).
+
+Now realize the classes by means of default methods. For that, add a method String getClassName() to all classes/interfaces where it might be useful.
+
+Please note that the tests we provided expect our envisioned solution. If you have chosen another meaningful organization of classes/interfaces, your solution may nonetheless be correct - even if this is not approved by our tests.
