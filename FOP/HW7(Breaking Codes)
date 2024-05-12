@@ -1,0 +1,95 @@
+Breaking codes with Iterator and Iterable
+
+In this assignment we deal with applications of the Iterator and Iterable interface of the Java standard library.
+
+A Iterator<T> allows to process a collection of objects. For that, an Iterator<T> has to implement methods boolean hasNext() and T next(). Successive calls of next() return succesive objects from the collection. Thereby, the method hasNext() returns true if there are further objects in the collection which have not yet been returned by a call to next() for the given iterator, and false otherwise.
+
+Das Interface [Iterable<T>](https://docs.oracle.com/en/java/javase/13/docs/api/java.base/java/lang/ Iterable.html) has the method Iterator<T> iterator() which returns an iterator. Many collections of objects, e.g., lists from the standard library, realize the interface Iterable. At a call of the method iterator(), they return an `Iterator object which allows to iterate over the elements of the collection.
+
+1. Iterable ranges of numbers.
+
+For a start, we want to realize ranges of numbers with a given step size. An instance of Range provides an interval of int values starting at begin and ending at end (both boundary values included) with a step size stride. An instance of Range represents the integer values in the range from begin to end whose absolute difference to begin is an integer multiple of stride. It my thus happen that end is not included. If begin < end, then it is an ascending, if begin > end a descending sequence of numbers. If begin == end, the sequence of numbers only consists of the value begin. Realize the class Range as follows:
+
+Implement a class Range with the private and final object attributes begin, end and stride of type int. Range should implement the interface Iterable<Integer>.
+
+Realize a constructor public Range(int begin, int end, int stride) which initializes an object of the class Range. For that, store the parameters of the constructor into the appropriate object attributes. If stride is less or equal to 0, the method badArgument(String errorMessage) from Util should be called with a meaningful error message.
+
+Realize a constructor public Range(int begin, int end) which initializes an object of class Range appropriately with the given parameters. The attribute stride should be set to 1.
+
+realize a method public Iterator<Integer> iterator() which returns an iterator which iterates over the values from begin to end. Thereby, the returned Iterator object should not modify the given Range object. Der Iterator should provide implementations of the methods hasNext() and next() in order to satify the specification of the interface. If next() is called more often than there are elements, the method noSuchElement(String errorMessage) of Util should be called by next().
+
+Tests
+
+Struktural tests 0 of 4 tests passing
+
+Konstructor with three parameters 1 of 1 tests passing
+
+Range range = new Range(14,24,3);
+
+
+Constructor with two parameters 1 of 1 tests passing
+
+Range range = new Range(14,17);
+
+
+iterator() Example 1 1 of 1 tests passing
+
+Range range = new Range(14, 24, 3);
+Iterator<Integer> iter = range.iterator(); // Iterator for 14, 17, 20, 23
+
+
+iterator() Example 2 1 of 1 tests passing
+
+Range range = new Range(-4, -13, 3);
+Iterator<Integer> iter = range.iterator(); // Iterator for -4, -7, -10, -13
+
+
+2. PIN Iterator
+
+For breaking digit codes, we now create an iterator which enumerate all sequences of digits as Strings of a specific length (possibly with leading zeros to fill up). Digit codes which are known to be popular should be returned by the iterator at first. Concretely, digit codes should be enumerated by the iterator in the following order:
+
+Codes consisting of the repetition of a single digit.
+
+Codes consisting of ascending sequences of digits, i.e., of sequences in which each subsequent digit exceeds its predecessor by 1.
+
+Codes consisting of decreasing sequences of digits, i.e., of sequences in which each subsequent digit is smaller than its predecessor by 1.
+
+All remaining codes of the given length.
+
+Within each of the four categories, the codes should be enumerated in ascending order. Each code should be enumerated by the iterator at most once.
+
+Realize a class PasswordIterator which implements the interface Iterator<String>. The public constructor of this class expects exactly one int value representing the password's length. If the passed value is less than 1 or greater than 9, the method badArgument(String errorMessage) from Util should be called with an appropriate error message. An object of the class PasswordIterator should realize the order on digit codes of the given length as specified above by means of the methods next() and hasNext() from the interface Iterator. If next() is called when the last sequence of digits has already been returned, then next() should call the method noSuchElement(String errorMessage) from Util with an appropriate error message.
+
+Hints:
+
+For each of the permitted lengthes of passwords, the first 100,000 digit sequences should be process in at most 5 sec.
+
+The method String longToStringWithLength(long value, int length) from Util may be useful for the implementation.
+
+Passcode Breaker
+
+For secrecy reasons, passwords are usually not plainly stored. Instead, in combination with another value, the salt, a hash value is computed and stored. In order to verify whether a user has provided the correct password, her input is combined with the salt for computing the hash value. If the computed value coincides with the stored value, the input is accepted as correct password. Implement in the class PasswordBreaker the public static method String findPassword(Function<String, Integer> hashFunction, int passwordLength, String salt, int saltedPasswordHashValue), which returns a sequence of digits password of length passwordLength so that the provided function hashFunction when receiving the value password concatenated with salt, results in the value saltedPasswordHashValue. If no such sequence of digits exists, null should be returned. If the argument salt or hashFunction are equal to null, the method badArgument(String errorMessage) from Util should be called with a meaningful error messge.
+
+Tests
+
+PasswordIterator Example 1 of 1 tests passing
+
+PasswordIterator iter = new PasswordIterator(1); // Iterator for digit sequences of length 1
+
+
+PasswordIterator Example 0 of 1 tests passing
+
+PasswordIterator iter = new PasswordIterator(4); // Iterator for digit sequences of length 4
+
+
+PasswordIterator Example 0 of 1 tests passing
+
+Here, the first 100,000 codes are checked:
+
+PasswordIterator iter = new PasswordIterator(9); // Iterator for digit sequences of length 9
+
+
+PasswordBreaker Example 0 of 1 tests passing
+
+String password = PasswordBreaker.findPassword(s -> s.hashCode(), 5, "QSZT", -755768890);
+System.out.println("04383".equals(password)) // returns true
