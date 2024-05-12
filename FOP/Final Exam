@@ -1,0 +1,170 @@
+Problem Statement
+
+Shadows and Light
+
+In this assignment, you will calculate the shadows of obstacles in a 2D world.
+
+Given an array of intervals Interval[] obstacles. Thereby, an Interval comes with attributes x, y and width.
+x, y represent the coordinates of the left upper corner, while width provides the extension into the direction of growing x-values.
+
+We assume that there is a longish light source stretched from x=0, y=0 to x=Integer.MAX_VALUE,y=0. That light emits beams of light vertically downward, i.e., in direction of growing y-values.
+
+In the following, all x, y as well as width values are non-negative. you may assume that none of the parameters is null and that passed arrays do not contain null values.
+
+1. Sub-task (2 points)
+
+Implement the method covers(Point p) of the class Interval. A Point is represented by x and y values. The method should return true, either if the point is contained in the interval or it it lies in the shade of the interval. Otherwise, false should be returned. The coordinates of a point can be accessed by means of the methods getX() and getY(), respectively.
+
+2. sub-task (4 points)
+
+Implement the method allCovering of the class Util. The method should return the intervals from obstacles which lie between the light source and the current point or contain the point. The returned array should be exactly as large as to record the set of intervals to be returned. The intervals should be returned in the same order in which they occur in the argument array. If no interval shades or contains the given point, an array of length 0 should be returned.
+
+3. Sub-task (4 points)
+
+Implement the method isCoveredBy of class Interval. The method decides for a given interval whether it is completely shaded by or contained in the intervals from the set given by obstacles. true should be returned when the interval is shaded or contained, otherwise false.
+
+#2     2D Sparse Arrays
+
+Problem Statement
+
+2D Sparse Arrays
+
+In this assignment, you are goint to implement a sparse 2D array. This data-structure arranges its elements in 2D as a 2D array in Java (array[x][y]). In contrast, though, that the new data-structure only stores objects which are different from null. Thus, null elements do not occupy any space.
+
+For this, implement the class Sparse2DArray with functionality as specified below. The class Sparse2DArray should be generic where the generic type parameter of the class represents the element type of the 2D array.
+
+Concerning visibility of attributes, be as restrictive as possible. The same holds for your own auxiliary methods.
+
+Example: the Java 2D array
+
+{{"a",  null, null},
+ {null, "b",  null},
+ {null, null, "c" }}
+
+
+when represented as a sparse array, looks like:
+
+[[x=0, y=0, value="a"], [x=1, y=1, value="b"], [x=2, y=2, value="c"]]
+
+
+1. Generic (1 point)
+
+Realize the class Sparse2DArray generically with type parameter T.
+
+2. Inner Class Element (1 point)
+
+Realize the class Element inside of the class Sparse2DArray. This class is meant to represent for a sparse 2D array a value sitting at position x, y and therefore, requires the attributes:
+
+x-index: x
+
+y-index: y
+
+the value at the given position: value
+
+This class should be generic as well. Accordingly, use the type parameter at the appropriate places.
+
+Make sure that the attribute value never equals null, otherwise throw an appropriate RuntimeException.
+
+3. Generic Sparse2DArray (1 point)
+
+The implementation of Sparse2DArray should have the following properties:
+
+the size of the 2D array in x-direction is constant.
+
+the size of the 2D array in y-direction is constant.
+
+the non-null entries are recorded as Element objects and stored in a list, e.g., java.util.LinkedList.
+
+Provide a public constructor Sparse2DArray(sizeX, sizeY) which creates a new empty Sparse2DArray of the given size.
+
+Additionally, implement the public methods getSizeX() and getSizeY().
+
+4. Set and Get (2 points)
+
+Take into account the following important constraints:
+
+As for arrays in Java, both x- and y-indices start with: 0.
+
+An element of the 2D array is represented as an Element object in the list if and only if it has a value different from null.
+(Exacty for that reason, the sparse 2D array is more memory efficients, since null values are not explicitly stored)
+
+For both method check whether the parameters x and y are valid and throw a java.lang.IndexOutOfBoundsException otherwise.
+
+Implement a public method get(x, y) which returns the value at the given position.
+
+Implement a public method set(x, y, value) which sets the value at the given position to value.
+
+For both methods take the specific treatment of null into account. For valid x, y, neither set nor get may throw an exception!
+
+5. Method hasDuplicateValues (2 points)
+
+Implement the method
+
+public boolean hasDuplicateValues()
+
+
+which returns true if and only if the given Sparse2DArray contains multiple identical values different from null. Accordingly, for an empty Sparse2DArray the value false is returned.
+
+Hint: you may assume that equals and hashCode are appropriately implemented for the given element type.
+
+6. Static Method fromArray (1 point)
+
+Implement the method fromArray:
+
+public static <T> Sparse2DArray<T> fromArray(T[][] array2d)
+
+
+This static method creates a sparse representation Sparse2DArray of the 2D array passed as parameter, i.e., for the returned object, the call get(x, y) should be equivalent to array2d[x][y]. The method should throw an appropriate RuntimeException when the passed argument array is invalid:
+
+array2d itself is null
+
+some array2d[x] is null
+
+two array[x1], array[x2] have different lengthes, i.e., the y-length is inconsistent.
+
+7. Method toArray (2 points)
+
+Implement the method
+
+public T[][] toArray(Function<Integer, T[]> array1dFunc, Function<Integer, T[][]> array2dFunc)
+
+
+which returns a 2D Java array of generic element type T which exactly has the dimensions of Sparse2DArray. the apply methods of the Function arguments are meant to return 1D and 2D arrays, respectively, of the size passed as parameter (sorry for this complication: but new T[10] is not permitted in Java).
+
+Hint: Function is provided in package java.util.function.
+
+Example Application:
+
+Sparse2DArray<String> a = ...
+String[][] array2d = a.toArray(String[]::new, String[][]::new);
+
+
+The two methods toArray (with appropriate Functions as arguments) composed with fromArray, should provide the identity transformation.
+
+#3     Streams and Dreams
+
+Mapping, Filtering and Reduction of File Streams
+
+Given a method
+
+Stream<String> getFiles(),
+
+which returns the paths to all files in the current directory as a Stream of String objects, realize the following static methods.
+
+Filtering CSV files: filterCsvFilePaths() (1 point) 0 of 1 tests passing
+
+Filter the argument stream so that only file access paths ending with ".csv" remain.
+
+Load All Lines: getAllLines() (3 points) 0 of 1 tests passing
+
+All lines of all CSV files should be returned as a Stream<String>. The lines of a CSV files can be obtained by means of the provided method Stream<String> getLinesOfFile(String filePath). Nested Streams may be simplified by means, e.g., of flatMap().
+
+Parsing the numbers in lines: parseLines() (4 points) 0 of 1 tests passing
+
+The argument stream of lines should be transformed by means of map() and filter() into a Stream Integer arrays. For that, each String representing a line, should be partioned at commas by means of split(). You may assume that each line consists of five comma separated integer entries which should be transformed into an Integer[]. It may be convenient to use the auxiliary methods arrayToStream() and intStreamToIntArray().
+
+Column summing: sumColumns() (2 points) 0 of 1 tests passing
+
+From the argument stream of arrays of length 5, a single array of length 5 should be constructed by means of reduce(), where each entry of the result array represents the sum of the corresponding entries of the arrays in the stream. Here, you may use the auxiliary method addArrays().
+
+All operations should be realized without side-effects by means of stream operations.
