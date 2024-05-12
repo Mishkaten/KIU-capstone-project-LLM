@@ -1,0 +1,57 @@
+Problem statement:
+
+Pingu Row
+
+Penguins often can be met in sequences or rows. Within these, they do not always stand one behind the other so that (looking from the side) one now and then may hide another. In the following, we are going to define a regular expression by which such series can be described to allow us to decide which series altogether are possible.
+
+For the description, the following rules are applied:
+
+A penguin is denoted by the word Peng if it looks to the right, and with Gnep if it looks to the left. In each row, only penguins occur (no polar bears, e.g.).
+
+If a penguin is hided by the subsequent penguin, a suffix of its word is removed. Examples:
+
+Pen describes a right-looking penguin who is partly hidden.
+
+Gn describes a left-looking penguin who is severely hidden.
+
+We are only interested in penguins of which at least one third is visible. All others are ignored. This means that the remaining portion must at least contain two characters.
+
+A row of penguins is written by concatenating their words. Examples with two penguins in a row:
+
+PengPeng both penguins are fully visible.
+
+GnePeng the right penguin (Peng) hides the left penguin (Gne).
+
+The rightmost penguin is the last in the row and therefore is fully visible.
+
+Each row consists of at least one penguin.
+
+Some more examples with comments following //:
+
+                 // invalid: violates rule 6
+Peng             // valid
+Gnep             // valid
+Pen              // invalid: violates rule 5
+PengPeng         // valid
+PenGnep          // valid
+PPeng            // invalid: violates rule 3
+Pooh             // invalid: not a penguin!
+
+
+Rows can be arbitrily long:
+
+PenPengGnepPengGneGnPePePeng
+
+
+Please provide a regular expression which precisely describes the set of words defined by the above rules. Thereby, use the syntax of from the lecture.
+
+You may proceed according to the following sub-tasks:
+
+Create a regular expression for right-looking penguins who may be partially hidden.
+
+Create a regular expression for left-looking penguins who may be partially hidden.
+
+Create a regular expression for arbitrary rows of penguins (watch out for 5. and 6.).
+
+Hint: You may upload your solution as PDF, PNG oder JPG. Take care that text and structure is clearly readable and that your solution is correctly oriented. Otherwise, points may be deduced. Please note that aber hitting "Submit", no revised version can be uploaded
+
