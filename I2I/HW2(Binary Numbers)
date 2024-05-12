@@ -1,0 +1,46 @@
+Problem statement:
+
+Binary Numbers
+
+Besides the welknown decimal representation of numbers, Java offers the possibility to represent numbers to base 2 (binary, 0 and 1), 8 (octal, 0 to 7) and 16 (hexadecimal, 0 to 9 and A to F). In order for the Java Compiler to identify which base has been chosen by the programmer, rules have been provided to make this distinction clear:
+
+Binary numbers receive the prefix 0b or 0B
+
+Octal numbers start with a 0 at the first position
+
+Decimal numbers as described in the lecture, but always without leading 0
+
+Hexadecimal numbers start with 0x or 0X
+
+For the number 42 (in decimal representation), the different number formats result in
+
+binary: 0b101010
+
+octal: 052
+
+hexadecimal 0x2A
+
+Our goal is to produce a regular expression for binary numbers. The binary system is that within which all computers compute, since it is technically particularly easy to realize. Here, we are only interested in a regular expression for constants written in binary. As explained in the lecture, we thus may use the operators
+
+Alternative |
+
+Iteration * (arbitrarily often, including 0-times)
+
+Concatenation <via juxtaposition>
+
+Option with ?
+
+For binary numbers we must take into account that
+
+Binary numbers start with 0 followed by a small b or capital B
+
+Subsequenty come arbitrarily many, but at least ono binary digit, i.e., 0 or 1
+
+In order to structure long binary numbers, it is permitted to insert between digits one or multiple _ for grouping them. (In fact, this is allowed for all number formats)
+
+0_b0110, 0b_0110 or 0b0110_ are thus not allowed, 0b0000_0111_0110_1111 or 0b001__0111_0110____101 or 0B00101110110101 on the other hand are legal.
+
+Now create a corresponding regular expression.
+
+Hint: This is a tutored exercise to be solved during FoP hours. Neither can you upload solutions, nor are there any corrections.
+
