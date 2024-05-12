@@ -23,6 +23,10 @@ Implement the method allCovering of the class Util. The method should return the
 
 Implement the method isCoveredBy of class Interval. The method decides for a given interval whether it is completely shaded by or contained in the intervals from the set given by obstacles. true should be returned when the interval is shaded or contained, otherwise false.
 
+
+
+
+
 #2     2D Sparse Arrays
 
 Problem Statement
@@ -102,7 +106,6 @@ Implement the method
 
 public boolean hasDuplicateValues()
 
-
 which returns true if and only if the given Sparse2DArray contains multiple identical values different from null. Accordingly, for an empty Sparse2DArray the value false is returned.
 
 Hint: you may assume that equals and hashCode are appropriately implemented for the given element type.
@@ -112,7 +115,6 @@ Hint: you may assume that equals and hashCode are appropriately implemented for 
 Implement the method fromArray:
 
 public static <T> Sparse2DArray<T> fromArray(T[][] array2d)
-
 
 This static method creates a sparse representation Sparse2DArray of the 2D array passed as parameter, i.e., for the returned object, the call get(x, y) should be equivalent to array2d[x][y]. The method should throw an appropriate RuntimeException when the passed argument array is invalid:
 
@@ -128,7 +130,6 @@ Implement the method
 
 public T[][] toArray(Function<Integer, T[]> array1dFunc, Function<Integer, T[][]> array2dFunc)
 
-
 which returns a 2D Java array of generic element type T which exactly has the dimensions of Sparse2DArray. the apply methods of the Function arguments are meant to return 1D and 2D arrays, respectively, of the size passed as parameter (sorry for this complication: but new T[10] is not permitted in Java).
 
 Hint: Function is provided in package java.util.function.
@@ -138,8 +139,11 @@ Example Application:
 Sparse2DArray<String> a = ...
 String[][] array2d = a.toArray(String[]::new, String[][]::new);
 
-
 The two methods toArray (with appropriate Functions as arguments) composed with fromArray, should provide the identity transformation.
+
+
+
+
 
 #3     Streams and Dreams
 
