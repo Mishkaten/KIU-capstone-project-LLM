@@ -1,0 +1,31 @@
+Problem statement:
+
+Syntaxbaumwurzel
+
+The following MiniJava program computes for a natural number 𝑛n provided by the user, the lower floor of the square root ⌊𝑛⌋⌊n​⌋. For that, a variation of the Heron method is employed. Eventually, the result is printed onto the console.
+
+int n;
+int x, t;
+n = readInt();
+t = 1;
+x = (n / 2) + 1;
+while (t != 0) {
+    t = ((n / x) + x) / 2;
+    if (x - t > 1)
+        x = t;
+    else {
+        x = x - 2;
+        if (t * t <= n)
+            x = t;
+        t = 0;
+    }
+}
+write(x);
+
+
+Draw the syntax tree for this MiniJava program according to the MiniJava grammar from the lecture. Follow the representation of syntax trees from the slides. The boxes around components can be omitted, also colors are not mandatory. The tokens for number and name need not be further split into letters and/or digits.
+
+Hint: Take care that the presentation is perfectly clear. Roughly calculate beforehand, how much space you need for the various parts of the program. You need not align all terminals onto one line at the bottom.
+
+you may hand in your solution as PDF, PNG or JPG. Take care that text and structure is clearly readable. Make sure that the orientation of your solution is correct. Otherwise, you may suffer deduction of points. Please note that, once you have pressed "Submit", your solution can no longer be updated.
+
