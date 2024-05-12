@@ -1,0 +1,117 @@
+The yellow-eyed penguin (Megadyptes antipodes) is on the edge of extinction. Scientists have the plan to relocate the remaining yellow-eyed penguins to some area, where they will be safe from natural enemies. To increase the chances of success of this plan, KIU has been asked for help by providing a cutting-edge simulation of the population development.
+
+Penguins
+
+Penguins are divided into 5 age groups: young, young adult, adult, old adults, and elder. In each step of the simulation, each penguin moves to the next age group, with the restrictions described below. Elder penguins have already reached maximum life expectancy and are not getting older: they pass away peacefully in their sleep.
+
+Mating and Breeding
+
+Young adult, adult, and old adult penguins try to ensure continued existence of the yellow-eyed penguin via breeding. This creates young animals according to the following rules:
+
+Young adults are still looking for partners, so only 𝑛𝑢𝑚𝑏𝑒𝑟𝑜𝑓𝑦𝑜𝑢𝑛𝑔𝑎𝑑𝑢𝑙𝑡𝑠44numberofyoungadults​ nestlingss are born.
+
+Adults generally have found partners (and a secure job); accordingly 𝑛𝑢𝑚𝑏𝑒𝑟𝑜𝑓𝑎𝑑𝑢𝑙𝑡𝑠22numberofadults​ nestlingss are born.
+
+Old adults are in great fear of penguin retirement; therefore, only 𝑛𝑢𝑚𝑏𝑒𝑟𝑜𝑓𝑜𝑙𝑑𝑎𝑑𝑢𝑙𝑡𝑠33numberofoldadults​ nestlings are born.
+
+Of course, there can not be half nestlings (young penguins), so 31 young adults would have only 7 children(314≃7431​≃7)
+
+Feeding
+
+Soley, young adults and adults are resonsible for searching for food. Each penguin needs 1 meal portion per one unit of time.
+
+Young adults collect 3 portions of food per unit of time.
+
+Adults collect 2 portions of food per unit of time.
+
+In order to secure survival of the yellow-eyed penguin, food is distributed according to the following rules
+
+young
+
+young adults
+
+adults
+
+old adults
+
+elder
+
+All penguins that are not fed, die immediately. If at the end of some step food is left, unfortunately, it becomes rotten can no longer be used in subsequent steps.
+
+Simulation
+
+In each time step, the population is changed as follows:
+
+Penguins collect all food.
+
+Food is distributed. If there is not enough food, penguins starve to death.
+
+Penguins breed, then proceed in age.
+
+Young penguins are added to the population.
+
+Program Execution
+
+Your program should first ask the user how many time steps should be simulated (on input less then 1, your program should output number of steps >= 1 required amd terminate).
+
+Next, your program should ask for the initial numbers of penguins for each age group in order (From young to elder). Negative input should not be accepted.
+
+After having received the numbers of penguins in each group, the program should simulate the number of steps entered by the user.
+
+At the end of the simulation, the program should print the number of pen- guins in each group. Each group should be printed line by line: young, young adult, adult, old adult, and elder penguins.
+
+Example Program Execution
+
+1. Example with single time step 0 of 1 tests passing
+
+<Please insert the number of time steps (>= 1):
+>1
+<Initial number of young:
+>300
+<Initial number of young adults:
+>400
+<Initial number of adults:
+>500
+<Initial number of old adults:
+>500
+<Initial number of elders:
+>1000
+<Final number of young:
+<516
+<Final number of young adults:
+<300
+<Final number of adults:
+<400
+<Final number of old adults:
+<500
+<Final number of elders:
+<500
+
+
+2. Example with 100 time steps 0 of 1 tests passing
+
+<Please insert the number of time steps (>= 1):
+>100
+<Initial number of young:
+>300
+<Initial number of young adults:
+>400
+<Initial number of adults:
+>500
+<Initial number of old adults:
+>500
+<Initial number of elers:
+>1000
+<Final number of young:
+<5495
+<Final number of young adults:
+<5354
+<Final number of adults:
+<5217
+<Final number of old adults:
+<5083
+<Final number of elders:
+<4952
+
+
+Hint For better readability, program output is preceded with "<". Lines with user input are preceded with ">". These characters do not belong to the program execution itself.
