@@ -1,0 +1,37 @@
+Problem statement:
+
+Root
+
+The following MiniJava program computes for a natural number 𝑛n provided by the user, the lower floor of the square root ⌊𝑛⌋⌊n​⌋. For that, a variation of the Heron method is employed. Eventually, the result is printed onto the console.
+
+int n;
+int x, t;
+n = readInt();
+t = 1;
+x = (n / 2) + 1;
+while (t != 0) {
+    t = ((n / x) + x) / 2;
+    if (x - t > 1)
+        x = t;
+    else {
+        x = x - 2;
+        if (t * t <= n)
+            x = t;
+        t = 0;
+    }
+}
+write(x);
+
+
+Follow the rules from the lecture and translate the MiniJava Program into a MiniJVM Program. i.e. perform the follwing tasks:
+
+Provide a mapping from variables to indices
+
+Generate code of the JVM with symbolic labels
+
+Provide a mapping from symbolic labels to the corresponding code addresses (with real numbers)
+
+The MiniJVM commands from the lecture can be found in the following table:
+
+TypeCommandint Operators:NEG, ADD, SUB, MUL, DIV, MODboolean Operators:NOT, AND, ORComparison Operators:LESS, LEQ, EQ, NEQLoading of Constants:CONST i, TRUE, FALSEMemory Operations:LOAD i, STORE iJump Instructions:JUMP i, FJUMP iIO-Instructions:READ, WRITEAllocation of memory:ALLOC iTermination of the Program:    HALT
+
