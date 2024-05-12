@@ -1,0 +1,45 @@
+Penguin Colonies
+
+We are concerned about penguin colonies where we would like get hold of our penguin friends as quickly as possible. For that, we use a data-structure which efficiently supports corresponding queries. Penguin colonies therefore are recorded in the collection HashSet.
+
+The class HashSet<E> provides us with an implementation of variable sets of objects of type E. Thereby, the -structure HashSet is realized in such a way that, given a well-chosen hash function for the maintained objects, it can be checked very efficiently whether or not an element is contained in the set or not. Likewise, addition of new elements to as well as removal of elements from the set are supported. Thereby, the implementation of HashSet relies on the the methods hashCode() and equals() from E as hash function and test of equality, respectively.
+
+Penguins
+
+First, the class Penguin should be extended by implementations of these two methods. Objects of the class Penguin are equipped with the final attributes int birthYear, String name, Gender gender. We assume here that penguins are uniquely identified by the combination of these attributes. There is another attribute Fish favoriteFish which is not final - since tastes and favorites may change in the course of penguin life.
+
+equals() 2 of 2 tests passing
+
+Implement the method equals(Object other) in Penguin which realizes a test for equality. This method should check whether other is a penguin with the same final attribute values. Please also return a correct result when the parameter other or one (or several) of the encountered attributes are null. The non-final attribute favoriteFish should not be included into the equality check. This is important for the HashSet of penguins to work correctly even when the favoriteFish may change.
+
+hashCode() 1 of 1 tests passing
+
+Implement a meaningful method hashCode in Penguin. Your method should satisfy the hashCode contract.
+
+(There is no unique or best solution here. The public test just checkes for some values whether you have changed the inherited method.)
+
+Penguin Colonies
+
+Each object from PenguinColony represents a penguin colony, and therefore has an attribute HashSet<Penguin> which maintains the penguins in the colony. In the following sub-tasks, you may assume (for simplicity) that passed arguments are not null, that collections do not contain null objects, and that no pengiun has null attribute values.
+
+Extend the class PenguinColony with implementations of the following methods:
+
+uniteColonies() 1 of 1 tests passing
+
+void uniteColonies(PenguinColony otherColony) which takes another penguin colony otherColony and adds its penguins into the current colony. The penguin colony otherColony should, after execution of this method, be empty.
+
+splitColony() 1 of 1 tests passing
+
+PenguinColony splitColony(Predicate<? super Penguin> pred). Thereby, all penguins which satisfy the predicate pred, should be removed from the given colony and collected into a new colony which is returned as result.
+
+findFirstFriend() 1 of 1 tests passing
+
+Penguin findFirstFriend(LinkedList<Penguin> penguinFriends) which returns the first penguin from the list penguinFriends which dwells in the colony. The method should neither modify the colony nor the list penguinFriends.
+
+canFeedPenguinsWithProperty() 1 of 1 tests passing
+
+boolean canFeedPenguinsWithProperty(Predicate<? super Penguin> pred, Set<Fish> fishes) which returns true if for every penguin in the colony satisfying the predicate pred, the favorite fish is contained in the set fishes. Otherwise, false should be returned. (Thereby, it should be irrelevant whether only one or many penguins prefer the same kind of fish: there is always enough supply of every kind of fish in the set).
+
+computeSum() 1 of 1 tests passing
+
+int computeSum(Function<? super Penguin, Integer> fun) which applies the function represented by fun, to all penguins of the colony returns the sum of the computed values.
