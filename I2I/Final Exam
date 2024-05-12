@@ -1,0 +1,262 @@
+Quiz 8Points
+1) Regular Expressions
+
+Which of the given sequences of letters are contained in the language described by the regular expression (a*|cc)d?
+
+Please choose all  answer options
+
+aaad
+
+acdd
+
+acc
+
+accd
+
+d
+
+
+
+2) Classes and Inheritance
+
+Which of the following statements are  for Java?
+
+Please choose all  answer options
+
+
+Object is the common subclass of all classes.
+
+Classes cannot inherit from classes declared as final.
+
+Class is the common superclass of all classes.
+
+A class may implement at most one interface.
+
+Integer is a subclass of Long.
+
+Abstract classes cannot implement interfaces.
+
+
+3) Arrays and Data-types
+
+Given the following Java code:
+
+Which of the following statements is true?
+
+Please choose all  answer options
+
+The code cannot be compiled since the implicit type cast from byte to double is not permitted.
+
+During execution, an ArrayIndexOutOfBoundsException is thrown.
+
+During execution, a NullPointerException is thrown.
+
+The program outputs 999.0 on the console.
+
+The code cannot be compiled since the explicit type cast from int to byte is not permitted.
+
+
+4) Java Language Constructs
+
+Given the following Java code:
+
+Which of the following statements is true?
+
+Please choose all  answer options
+
+
+
+The code cannot be compiled since class my have at most one static method.
+
+The code cannot be compiled since default is a reserved key word.
+
+During program execution, an ArithmeticException is thrown.
+
+When being executed, the program ouputs 100 on the console.
+
+When being executed, the program outputs Foo on the console.
+
+
+5) Programmin Language Java
+
+Why is not a valid name for a varialbe in Java?
+
+Please choose all  answer options
+
+
+
+because _ is a Java key word.
+
+Because it contains ä, ö and ß.
+
+Because in names, digits must not be followed by _.
+
+Because of the occurrence of a capital letter.
+
+Because the first character is a 3.
+
+
+
+6) Streams
+
+Consider the following Java code:
+
+Which of the following statements are true?
+
+Please choose all  answer options
+
+ 
+
+the code cannot be compiled.
+
+When being executed, the program outputs the two lines n=1 and n=2.
+
+When being executed, the program outputs the two lines n=1.0 and n=2.0.
+
+Nothing is output during program execution.
+
+When being executed, the program outputs the three lines n=0, n=1 and n=2.
+
+
+7) Properties of Algorithms
+
+Consider the following Java program:
+
+Which of the following statements is true?
+
+Please choose all  answer options:
+
+
+The program is dynamically finite.
+
+The program is statically finite.
+
+The program terminates.
+
+The implementation is recursive.
+
+The program is deterministic.
+
+
+
+8) Threads and Synchronization
+
+Which of the following statements concerning Threads and Synchronisation in Java are true?
+
+Please choose all  answer options
+
+
+Threads may wait for the termination of other Threads.
+
+Accesses to immutable objects need not be synchronized.
+
+New Threads can be started by means of the method start() of the class Thread.
+
+The expression new Thread(() -> {}) creates a new Thread object, but does ont start it.
+
+Threads may communicate with each other via Sockets.
+
+#Threads(12Points)
+
+Problem Statement
+
+Due to Covid-19, restaurants (if allowed to open) suffer restrictions in their capacities. This assignment realizes a simulation of a restaurant with waiting guests.
+
+Sub-task 1 (2 points)
+
+Implement a class GuestWaitingQueue which is thread-safe. Unboundedly many hungry guests, i.e., Runnable objects should be admitted for waiting. A call enqueue(Runnable r) enqueues the argument Runnable into the queue. A call assign() blocks until at least one Runnable is available inside the queue. Subsequently, a Runnable is extracted and returned.
+
+For the implementation, the class uses a List<Runnable> in order to maintain waiting Runnable objects. For the list, you may, e.g., use the methods add(Runnable e), Runnable remove(int index), and int size(). As an implementation, you may, e.g., use a LinkedList<>.
+
+Sub-task 2 (5 points)
+
+Now implement the class Table extends Thread which provides the following constructors and methods:
+
+public Table(GuestWaitingQueue gw).
+The constructor receives a GuesteWaitingQueue as a parameter.
+
+public void run().
+This method tries to get assigned a guest, i.e., a Runnable from GuestWaitingQueue and blocks if this is not possible. If there an exception occurs during dining, i.e., during execution of run(), the method tries to obtain another guest.
+
+public synchronized void doStop().
+This method takes care that the Restaurant stops waiting, does no longer start fresh dinings but terminates as soon the current guest (if any) has finished.
+
+Sub-task 3 (3 points)
+
+Implement the class Restaurant. This class receives in its constructor the maximal number of tables, i.e., threads to be created.
+
+A Restaurant offers for following constructors and methods:
+
+public Restaurant(int threadCount).
+constructor receiving the number of threads. It should initialize all attributes. It should establish the required number of tables and start the corresponding threads.
+
+public synchronized void reserve(Runnable task) throws Exception should add Runnable into the queue. If service has already been stopped, an IllegalStateException should be thrown.
+
+public synchronized void stop() terminates waiting as well as execution of all threads and prohibits that further Runnables are added to the queue.
+
+#JVM(10Points)
+Consider the following MiniJava program:
+
+int n, a, b, c;
+n = readInt();
+a = 0;
+b = 1;
+c = 0;
+while ((n - 1) < c) {
+    if (c % 2 == 1) {
+        a = a + b;
+    } else {
+        b = b + a;
+    }
+    c = c + 1;
+}
+write(a + b);
+
+
+Translate this MiniJava program into a MiniJVM program. Strictly adhere to the corresponding rules from the lecture! do not apply any manual optimizations!
+
+Ihr Programm soll n am Index 0 des Stacks abspeichern, a am Index 1, b am Index 2, und c am Index 3.
+
+Die Befehle der MiniJVM aus der Vorlesung finden Sie in der folgenden Tabelle:
+
+TypBefehlint-Operatoren:NEG, ADD, SUB, MUL, DIV, MOD
+
+boolean-Operatoren:NOT, AND, OR
+
+Vergleichs-Operatoren:LESS, LEQ, EQ, NEQ
+
+Laden von Konstanten:CONST i, TRUE, FALSE
+
+Speicher-Operationen:LOAD i, STORE i
+
+Sprung-Befehle:JUMP i, FJUMP i
+
+IO-Befehle:READ, WRITE
+
+Reservierung von Speicher:ALLOC i
+
+Beendung des Programms:    HALT
+
+#Programing Exercise(10Points)
+
+Problem Statement
+
+We consider the funtional interface Relation<X,Y> as given below. Implementations of this interface must provide a method test which takes two objects of types X and Y, respectively, and returns a boolean value. In this assignment, implementations of default methods for this interface must be provided.
+
+Sub-problem 1 (1 point)
+
+Implement a method negate for the given interface! The method should return a Relation where each call to test returns the negated result of test of the current Relation.
+
+Sub-problem 2 (1 point)
+
+Implement a method mirror for the given interface! The method should return a Relation where each call to test returns the result of test of the current Relation - buz with sapped ordering of the arguments. Additionally, replace the place-holders TODO at the method parameters with as general type parameters as possible!
+
+Sub-problem 3 (3 points)
+
+Implement a method and for the given nterface! The method should return a Relation where each call of test returns the logical AND of the return value of the method test of the current Relation and the method test of the Relation other provided as parameter. Additinoally, replace the place-holders TODO at the method parameters with as general type parameters as possible!
+
+Sub-problem 4 (3 points)
+
+Implement a method compose for the given interface! The method should return a Relation where each call to test passes the first argument to the Function object f, to whose result then together with the second parameter is passed to the method testof the current Relation.
+
+Additinoally, replace the place-holders TODO at the method parameters with as general type parameters as possible!
