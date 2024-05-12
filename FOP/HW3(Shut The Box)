@@ -1,0 +1,326 @@
+Shut the Box
+
+In this assignment, you are going to impelement a variant of the two-person dice game "Shut The Box".
+
+Game Preparation
+
+There are eight numbered boxes (from 1 to 8) which in the beginning, are all open.
+
+Playing
+
+In each round, players 1 and 2 play against each other. The respective player roles two dices and computes the sum of the obtained numbers. How she has to select a combination of two open boxes whose sum equals the thrown sum. When the dices showed, e.g., 4 + 4 = 8, then the boxes 1 and 7 (since 1+7=8) could be selected given that they are still open. The selected boxes then are closed. If no such selection is possible, the player receives the sum of all currently open boxes onto her account. An automatic check of all possibilities for the existence of at least one valid combination is not required.
+
+Game Over
+
+Altogether, 8 rounds are played where each round consists of one choice of each player. The player with the least account wins. The player who succeeds in some round to close the last remaining boxes, wins immediately - independently of the attained account values.
+
+Hints
+
+The method dice() from MiniJava returns the result of throwing a single dice. Use this method for realizing the throwing of two dices. Use readInt() from MiniJava to insert integer numbers. Use outputBoxes(boolean[] boxes) for outputting which boxes are still open.
+
+When the player is asked for a combination corresponding to the rolled number, the request is repeated until the input is correct, i.e., identifies two open boxes or 0 (no two appropriate boxes available). Always, two inputs are requested in each round.
+
+If a player believes that there is no valid combination left, she can signal to give up for this round by means of the input 0 in any of the two inputs.
+
+In any case, the checks whether there was a 0 or the sum equals the sum of thrown numbers, occurs only after input of both numbers. If there was a 0, the sum of open boxes is recorded.
+
+The required output format should be deduced from the example executions. Additionally after the last move, there could be the output "draw!".
+
+Realize your implementation without further classes or methods. If you use further classes and/or methods, this may graded as 0 points! As data-types, you only may use arrays as well as base types and Strings, as imports, only packages from java.lang.*.
+
+Example Output
+
+Example 1 - Player 2 wins by shutting the box 1 of 1 tests passing
+
+<Player 1 has thrown the numbers:
+<5
+<6
+<Open boxes: 1:true 2:true 3:true 4:true 5:true 6:true 7:true 8:true
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>8
+<Box 2:
+>3
+<Player 2 has thrown the numbers:
+<5
+<5
+<Open boxes: 1:true 2:true 3:false 4:true 5:true 6:true 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>7
+<Box 2:
+>3
+<Player 2 has thrown the numbers:
+<5
+<5
+<Open boxes: 1:true 2:true 3:false 4:true 5:true 6:true 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>6
+<Box 2:
+>4
+<Player 1 has thrown the numbers:
+<2
+<5
+<Open boxes: 1:true 2:true 3:false 4:false 5:true 6:false 7:true 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>2
+<Box 2:
+>5
+<Player 2 has thrown the numbers:
+<3
+<1
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<1
+<6
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<4
+<1
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which box to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<4
+<5
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+<0
+<Player 2 has thrown the numbers:
+<2
+<5
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<1
+<6
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<6
+<5
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Playerer 1 has thrown the numbers:
+<5
+<2
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<3
+<5
+<Open boxes: 1:true 2:false 3:false 4:false 5:false 6:false 7:true 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>1
+<Box 2:
+>7
+<Player 2 shuts all boxes! Player 2 wins!
+
+
+Example 2 - Player 1 wins by points 1 of 1 tests passing
+
+<Spieler 1 has thrown the numbers:
+<5
+<6
+<Open boxes: 1:true 2:true 3:true 4:true 5:true 6:true 7:true 8:true
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>7
+<Box 2:
+>6
+<Player 1 has thrown the numbers:
+<5
+<6
+<Open boxes: 1:true 2:true 3:true 4:true 5:true 6:true 7:true 8:true
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>2
+<Box 2:
+<1
+<Player 1 has thrown the numbers:
+<5
+<6
+<Open boxes: 1:true 2:true 3:true 4:true 5:true 6:true 7:true 8:true
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>7
+<Box 2:
+>4
+<Player 2 has thrown the numbers:
+<5
+<5
+<Open boxes: 1:true 2:true 3:true 4:false 5:true 6:true 7:false 8:true
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>8
+<Box 2:
+>2
+<Player 1 has thrown the numbers:
+<2
+<5
+<Open boxes: 1:true 2:false 3:true 4:false 5:true 6:true 7:false 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>1
+<Box 2:
+>6
+<Player 2 has thrown the numbers:
+<3
+<1
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<1
+<6
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<4
+<1
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 2? (0 für keine valide Kombination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<4
+<5
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<2
+<5
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<1
+<6
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<6
+<5
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 haw thrown the numbers:
+<5
+<2
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Welche Boxen möchte Spieler 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<3
+<5
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which boxes to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<6
+<4
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which box to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<2
+<2
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which box to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 has thrown the numbers:
+<5
+<6
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which box to shut by player 1? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 2 has thrown the numbers:
+<4
+<6
+<Open boxes: 1:false 2:false 3:true 4:false 5:true 6:false 7:false 8:false
+<Which box to shut by player 2? (0 for no valid combination)
+<Box 1:
+>0
+<Box 2:
+>0
+<Player 1 points:
+<48
+<Player 2 points:
+<56
+<Player 1 wins!
+
+
+Hint: For convenience, user input is preceded with a character > while lines produced by the program are preceded with <. These characters do not belong to the program execution.
