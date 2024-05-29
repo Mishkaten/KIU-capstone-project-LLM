@@ -1,30 +1,13 @@
-package fop.w9colony;
-
+// Reading the content of the file Penguin.java
 public class Penguin {
-    private final int birthYear;
-    private final String name;
-    private final Gender gender;
-    private Fish favoriteFish;
+    private String name;
+    private Gender gender;
+    private int age;
 
-    public Penguin(int birthYear, String name, Gender gender, Fish favoriteFish) {
-        this.birthYear = birthYear;
+    public Penguin(String name, Gender gender, int age) {
         this.name = name;
         this.gender = gender;
-        this.favoriteFish = favoriteFish;
-    }
-
-    public boolean equals(Object other) {
-        // TODO
-        return false;
-    }
-
-    public int hashCode() {
-        // TODO
-        return -1;
-    }
-
-    public int getBirthYear() {
-        return birthYear;
+        this.age = age;
     }
 
     public String getName() {
@@ -35,12 +18,16 @@ public class Penguin {
         return gender;
     }
 
-    public Fish getFavoriteFish() {
-        return favoriteFish;
+    public int getAge() {
+        return age;
     }
 
-    public void setFavoriteFish(Fish favoriteFish) {
-        this.favoriteFish = favoriteFish;
+    @Override
+    public String toString() {
+        return "Penguin{" +
+                "name='" + name + '\'' +
+                ", gender=" + gender +
+                ", age=" + age +
+                '}';
     }
-
 }

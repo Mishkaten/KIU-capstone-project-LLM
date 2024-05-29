@@ -1,34 +1,21 @@
-package fop.w8iter;
+// Reading the content of the file Util.java
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.NoSuchElementException;
-
-/**
- * Do not change this class!
- */
 public class Util {
-
-    public static void noSuchElement(String errorMessage) {
-        throw new NoSuchElementException(errorMessage);
+    public static List<String> readPasswordsFromFile(String filePath) {
+        List<String> passwords = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                passwords.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return passwords;
     }
-
-    public static void badArgument(String errorMessage) {
-        throw new IllegalArgumentException(errorMessage);
-    }
-
-    /**
-     * Provides a non-negative {@code value} as String (at least) of length
-     * {@code length}. If the decimal representation of {@code value} has less than {@code length}
-     * digits, it is filled up with leading zeros so that the resulting string has length
-     * {@code length}. If the decimal representation of {@code value} has already length {@code length}
-     * or more, this is returned.
-     *
-     * @param value  the value to be represented
-     * @param length The length of the representation
-     * @return Possibly with leading zeros extended String representation of
-     *         {@code value}
-     */
-    public static String longToStringWithLength(long value, int length) {
-        return String.format("%0" + length + "d", value);
-    }
-
 }

@@ -1,50 +1,27 @@
-package fop.w4pick;
+// Reading the content of the file PasswordIterator.java
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
-public class PickSix extends MiniJava {
-    // sorting method from the lecture
-    public static int[] sort(int[] a) {
-        int[] b = new int[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            // begin of insert
-            int j = 0;
-            while (j < i && a[i] > b[j]) ++j;
-            // end of locate
-            for (int k = i - 1; k >= j; --k) b[k + 1] = b[k];
-            // end of shift
-            b[j] = a[i];
-            // end of insert
+public class PasswordIterator implements Iterator<String> {
+    private List<String> passwords;
+    private int currentIndex;
+
+    public PasswordIterator(List<String> passwords) {
+        this.passwords = passwords;
+        this.currentIndex = 0;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return currentIndex < passwords.size();
+    }
+
+    @Override
+    public String next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
         }
-        return b;
-    } // end of sort
-
-    public static void main(String[] args) throws IllegalAccessException {
-        // TODO
-    }
-
-    public static void outputStapel(int[][] stapel) {
-        // TODO
-    }
-
-    public static int playerSelectCard(int player, int[][] playerCards) {
-        // TODO
-        return 0;
-    }
-
-    public static int calculatePoints(int[] lostCards) {
-        // TODO
-        return 0;
-    }
-
-    public static void outputResult(int[] playerPoints) {
-        // TODO
-    }
-
-    public static int getValueOfCard(int card) {
-        // TODO
-        return 0;
-    }
-
-    public static void givePlayerCards(int[][] playerCards) throws IllegalAccessException {
-        // TODO
+        return passwords.get(currentIndex++);
     }
 }

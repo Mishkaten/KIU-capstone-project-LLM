@@ -10,14 +10,15 @@ public class IntDoubleListElement {
     public int getInfo() {
         return info;
     }
-
+    public int value;
     public IntDoubleListElement next;
     public IntDoubleListElement prev;
 
-    public IntDoubleListElement(int startInfo) {
-        info = startInfo;
-        next = null;
-        prev = null;
+    public IntDoubleListElement(int value) {
+        this.value = value;
+        this.next = null;
+        this.prev = null;
+    }
     }
 
     public boolean isEqual(IntDoubleListElement other) {

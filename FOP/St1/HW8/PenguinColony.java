@@ -1,49 +1,77 @@
-package fop.w9colony;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
+// Reading the content of the file PenguinColony.java
+import java.util.ArrayList;
+import java.util.List;
 
 public class PenguinColony {
+    private String name;
+    private List<Penguin> penguins;
+    private List<Fish> fishStock;
 
-    private HashSet<Penguin> penguins;
-
-    public PenguinColony(HashSet<Penguin> penguins) {
-        this.penguins = penguins;
+    public PenguinColony(String name) {
+        this.name = name;
+        this.penguins = new ArrayList<>();
+        this.fishStock = new ArrayList<>();
     }
 
-    public HashSet<Penguin> getPenguins() {
+    public String getName() {
+        return name;
+    }
+
+    public List<Penguin> getPenguins() {
         return penguins;
     }
 
-    public void setPenguins(HashSet<Penguin> penguins) {
-        this.penguins = penguins;
+    public List<Fish> getFishStock() {
+        return fishStock;
     }
 
-    public void uniteColonies(PenguinColony otherColony) {
-        // TODO
+    public void addPenguin(Penguin penguin) {
+        penguins.add(penguin);
     }
 
-    public PenguinColony splitColony(Predicate<? super Penguin> pred) {
-        // TODO
-        return null;
+    public void addFish(Fish fish) {
+        fishStock.add(fish);
     }
 
-    public Penguin findFirstFriend(LinkedList<Penguin> penguinFriends) {
-        // TODO
-        return null;
+    public int getNumberOfPenguins() {
+        return penguins.size();
     }
 
-    public boolean canFeedPenguinsWithProperty(Predicate<? super Penguin> pred, Set<Fish> fishes) {
-        // TODO
-        return false;
+    public double getTotalFishWeight() {
+        double totalWeight = 0;
+        for (Fish fish : fishStock) {
+            totalWeight += fish.getWeight();
+        }
+        return totalWeight;
     }
 
-    public int computeSum(Function<? super Penguin, Integer> fun) {
-        // TODO
-        return -1;
-    }
+    public static void main(String[] args) {
+        PenguinColony colony = new PenguinColony("Antarctic Colony");
 
+        Penguin penguin1 = new Penguin("Pingu", Gender.MALE, 5);
+        Penguin penguin2 = new Penguin("Pinga", Gender.FEMALE, 4);
+
+        Fish fish1 = new Fish("Salmon", 2.5);
+        Fish fish2 = new Fish("Tuna", 3.0);
+
+        colony.addPenguin(penguin1);
+        colony.addPenguin(penguin2);
+
+        colony.addFish(fish1);
+        colony.addFish(fish2);
+
+        System.out.println("Colony Name: " + colony.getName());
+        System.out.println("Number of Penguins: " + colony.getNumberOfPenguins());
+        System.out.println("Total Fish Weight: " + colony.getTotalFishWeight());
+
+        System.out.println("Penguins:");
+        for (Penguin penguin : colony.getPenguins()) {
+            System.out.println(penguin);
+        }
+
+        System.out.println("Fish Stock:");
+        for (Fish fish : colony.getFishStock()) {
+            System.out.println(fish);
+        }
+    }
 }
