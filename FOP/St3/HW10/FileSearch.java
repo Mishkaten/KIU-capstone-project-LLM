@@ -1,71 +1,70 @@
-package fop.w10search;
-
 import java.io.IOException;
-import java.lang.invoke.CallSite;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
-
 public class FileSearch {
 
-    public static Result searchFile(Path file, String[] searched) {
+    public Result searchFile(Path file, String[] searched) {
         Result result = new Result(file);
-        List<String> read = null;
-        try {
-            read = Files.readAllLines(file);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        int i = 0;
-        for (String line : read) {
-            for (int k = 0; k < searched.length; k++) {
-                if (line.contains(searched[k]))
-                    result.addMatch(new Match(i + 1, line));
 
+        try {
+            List<String> lines = Files.readAllLines(file);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                for (String searchString : searched) {
+                    if (line.contains(searchString)) {
+                        result.addMatch(new Match(i, line));
+                        break; // Add the line only once
+                    }
+                }
             }
-            i++;
-        }
-
-        return result;
-    }
-
-    public static Set<Result> searchDirectory(Path directory, String searched[]) {
-        Set<Result> result = null;
-        try {
-            Stream<Path> walk = Files.walk(directory);
-            result = walk.filter(Files::isRegularFile).map(t -> searchFile(t, searched)).collect(Collectors.toSet());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            System.out.println("Error");
+            return null; // Return null in case of an exception
         }
 
         return result;
     }
 
-    public static List<Result> listResults(String directory, String searched[]) {
-        // TODO
-        Path P = Paths.get(directory);
-        List<Result> result = null;
-        result.stream().sorted(Comparator.comparing(t -> t.getMatches().size())).collect(Collectors.toList());
-        Collections.reverse(result);
-        return result;
+    public Set<Result> searchDirectory(Path directory, String[] searched) {
+        Set<Result> results = new HashSet<>();
+
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.filter(Files::isRegularFile).forEach(file -> {
+                Result result = searchFile(file, searched);
+                if (result != null) {
+                    results.add(result);
+                }
+            });
+        } catch (IOException e) {
+            System.err.println("Error reading directory: " + e.getMessage());
+        }
+
+        return results;
     }
 
+    public List<Result> listResults(String directory, String[] searched) {
+        Path dirPath = Paths.get(directory);
+        Set<Result> results = searchDirectory(dirPath, searched);
+
+        return results.stream()
+                .sorted(Comparator.comparingInt((Result r) -> r.getMatches().size()).reversed())
+                .collect(Collectors.toList());
+    }
 
     public static void main(String[] args) {
-        if(args.length < 2) System.out.println("Not enough args!");
-        for (Result i  : listResults(args[0], args)){
-            System.out.println(i.toString());
+        if (args.length < 2) {
+            System.err.println("Usage: java FileSearch <directory> <search strings...>");
+            System.exit(1);
         }
-    }
 
+        String directory = args[0];
+        String[] searchStrings = Arrays.copyOfRange(args, 1, args.length);
+
+        FileSearch fileSearch = new FileSearch();
+        List<Result> results = fileSearch.listResults(directory, searchStrings);
+
+        results.forEach(result -> System.out.println(result.toString()));
+    }
 }

@@ -1,26 +1,23 @@
-package fop.lists;
-
 public class IntDoubleListElement {
-    private int info;
+    int value;
+    IntDoubleListElement next;
+    IntDoubleListElement prev;
 
-    public void setInfo(int inf) {
-        info = inf;
+    public IntDoubleListElement(int value) {
+        this.value = value;
+        this.next = null;
+        this.prev = null;
     }
 
-    public int getInfo() {
-        return info;
+    public int getValue() {
+        return value;
     }
 
-    public IntDoubleListElement next;
-    public IntDoubleListElement prev;
-
-    public IntDoubleListElement(int startInfo) {
-        info = startInfo;
-        next = null;
-        prev = null;
+    public IntDoubleListElement getNext() {
+        return next;
     }
 
-    public boolean isEqual(IntDoubleListElement other) {
-        return other != null && info == other.info;
+    public IntDoubleListElement getPrev() {
+        return prev;
     }
 }

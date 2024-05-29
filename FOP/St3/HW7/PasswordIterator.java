@@ -1,50 +1,63 @@
-package fop.w4pick;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.TreeSet;
 
-public class PickSix extends MiniJava {
-    // sorting method from the lecture
-    public static int[] sort(int[] a) {
-        int[] b = new int[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            // begin of insert
-            int j = 0;
-            while (j < i && a[i] > b[j]) ++j;
-            // end of locate
-            for (int k = i - 1; k >= j; --k) b[k + 1] = b[k];
-            // end of shift
-            b[j] = a[i];
-            // end of insert
+public class PasswordIterator implements Iterator<String> {
+    private final int length;
+    private final TreeSet<String> passwords;
+    private Iterator<String> iterator;
+
+    public PasswordIterator(int length) {
+        if (length < 1 || length > 9) {
+            Util.badArgument("Password length must be between 1 and 9");
         }
-        return b;
-    } // end of sort
-
-    public static void main(String[] args) throws IllegalAccessException {
-        // TODO
+        this.length = length;
+        this.passwords = new TreeSet<>();
+        generatePasswords();
+        this.iterator = passwords.iterator();
     }
 
-    public static void outputStapel(int[][] stapel) {
-        // TODO
+    private void generatePasswords() {
+        // Repetitive digits
+        for (int i = 0; i < 10; i++) {
+            passwords.add(String.valueOf(i).repeat(length));
+        }
+
+        // Ascending sequences
+        for (int i = 0; i <= 10 - length; i++) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < length; j++) {
+                sb.append(i + j);
+            }
+            passwords.add(sb.toString());
+        }
+
+        // Descending sequences
+        for (int i = 9; i >= length - 1; i--) {
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < length; j++) {
+                sb.append(i - j);
+            }
+            passwords.add(sb.toString());
+        }
+
+        // All remaining codes
+        long max = (long) Math.pow(10, length);
+        for (long i = 0; i < max; i++) {
+            passwords.add(Util.longToStringWithLength(i, length));
+        }
     }
 
-    public static int playerSelectCard(int player, int[][] playerCards) {
-        // TODO
-        return 0;
+    @Override
+    public boolean hasNext() {
+        return iterator.hasNext();
     }
 
-    public static int calculatePoints(int[] lostCards) {
-        // TODO
-        return 0;
-    }
-
-    public static void outputResult(int[] playerPoints) {
-        // TODO
-    }
-
-    public static int getValueOfCard(int card) {
-        // TODO
-        return 0;
-    }
-
-    public static void givePlayerCards(int[][] playerCards) throws IllegalAccessException {
-        // TODO
+    @Override
+    public String next() {
+        if (!hasNext()) {
+            Util.noSuchElement("No more passwords");
+        }
+        return iterator.next();
     }
 }

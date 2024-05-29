@@ -1,255 +1,105 @@
-package fop.w3box;
+import java.util.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UncheckedIOException;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+public class ShutTheBox {
+    public static void main(String[] args) {
+        boolean[] boxes = new boolean[8];
+        Arrays.fill(boxes, true); // All boxes are initially open
 
-/**
- * This class provides convenience methods to make the barrier of entry into
- * programming easier. In addition to that it realizes an educational
- * sub-language to Java called "Mini Java" with simpler grammar.
- */
-public class MiniJava {
-    private static Random rand;
-    private static InputStream is = System.in;
-    private static BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        int player1Points = 0;
+        int player2Points = 0;
 
-    /**
-     * Reads a {@link String} from the console, and prompts the user by printing the
-     * given <code>text</code> with a line break to the console.
-     *
-     * @param text the text to display on the console before reading an input.
-     * @return the input string or <code>null</code>, if no input is available
-     *         (should normally not happen)
-     */
-    public static String readString(String text) {
-        // Exchange the reader in case System.in has changed.
-        // This is necessary for testing, as for every test input, System.in is changed.
-        // TODO: Consider whether a better solution is possible with mocking/a different
-        // InputStream implementation
-        // on the test side.
-        if (System.in != is) {
-            is = System.in;
-            bufferedReader = new BufferedReader(new InputStreamReader(is));
-        }
-        try {
-            System.out.println(text);
-            return bufferedReader.readLine();
-        } catch (IOException e) {
-            // We "hide" the exception in the method signature by rethrowing an unchecked
-            // exception
-            throw new UncheckedIOException("Input could not be parsed.", e);
-        }
-    }
-
-    /**
-     * Reads a {@link String} from the console, and prompts the user by printing the
-     * line
-     * <pre>
-     * Input:
-     * </pre>
-     *
-     * </i>
-     */
-    public static String readString() {
-        return readString("Input:");
-    }
-
-    /**
-     * Tries to read an <code>int</code> from the console, and retires if the input
-     * was not a valid integer. It prompts the user by printing the given
-     * <code>text</code> with a line break to the console.
-     *
-     * @see Integer#parseInt(String)
-     */
-    public static int readInt(String text) {
-        Integer x = null;
-        do {
-            String s = readString(text);
-            if (s == null)
-                throw new IllegalStateException("No input available.");
-            try {
-                x = Integer.parseInt(s.trim());
-            } catch (@SuppressWarnings("unused") NumberFormatException e) {
-                // try again
+        for (int round = 1; round <= 8; round++) {
+            if (playTurn(1, boxes)) {
+                System.out.println("Player 1 shuts all boxes! Player 1 wins!");
+                return;
             }
-        } while (x == null);
-        return x;
-    }
-
-    /**
-     * Works like {@link #readInt(String)}, but uses the following preset text to
-     * prompt the user:
-     *
-     * <pre>
-     * Please insert a number:
-     * </pre>
-     *
-     */
-    public static int readInt() {
-        return readInt("Please insert a number:");
-    }
-
-    /**
-     * Identical to {@link #readInt(String)}.
-     */
-    public static int read(String text) {
-        return readInt(text);
-    }
-
-    /**
-     * Identical to {@link #readInt()}.
-     */
-    public static int read() {
-        return readInt();
-    }
-
-    /**
-     * Tries to read an <code>double</code> from the console, and retires if the
-     * input was not a valid double value. It prompts the user by printing the given
-     * <code>text</code> with a line break to the console.
-     * <p>
-     * <i>Versucht einen <code>double</code>-Wert von der Konsole einzulesen, und
-     * wiederholt die Anfrage solange es nicht nicht um eine gültige
-     * <code>double</code>-Fließkommazahl handelt. Der oder die Benutzerin wird
-     * durch die Ausgabe des übergebenen <code>text</code>es zur Eingabe
-     * aufgefordert (mit Zeilenumbruch).</i>
-     *
-     * @see Double#parseDouble(String)
-     */
-    public static double readDouble(String text) {
-        Double x = null;
-        do {
-            String s = readString(text);
-            if (s == null)
-                throw new IllegalStateException("No input available.");
-            try {
-                x = Double.parseDouble(s.trim());
-            } catch (@SuppressWarnings("unused") NumberFormatException e) {
-                // try again
+            if (playTurn(2, boxes)) {
+                System.out.println("Player 2 shuts all boxes! Player 2 wins!");
+                return;
             }
-        } while (x == null);
-        return x;
-    }
-
-    /**
-     * Works like {@link #readDouble(String)}, but uses the following preset text to
-     * prompt the user:
-     *
-     * <pre>
-     * Please insert a number:
-     * </pre>
-     *
-     */
-    public static double readDouble() {
-        return readDouble("Geben Sie eine Zahl ein:");
-    }
-
-    /**
-     * Prints the {@link String} to the console and breaks the line.
-     * <p>
-     * <i>Gibt den {@link String} auf der Konsole aus und beginnt eine neue
-     * Zeile.</i>
-     */
-    public static void write(String output) {
-        System.out.println(output);
-    }
-
-    /**
-     * Prints the <code>int</code> to the console and breaks the line.
-     */
-    public static void write(int output) {
-        write("" + output);
-    }
-
-    /**
-     * Prints the <code>double</code> to the console and breaks the line.
-     */
-    public static void write(double output) {
-        write("" + output);
-    }
-
-    /**
-     * Identical to {@link #write(String)}.
-     */
-    public static void writeLineConsole(String output) {
-        System.out.println(output);
-    }
-
-    /**
-     * Identical to {@link #write(int)}.
-     */
-    public static void writeLineConsole(int output) {
-        writeLineConsole("" + output);
-    }
-
-    /**
-     * Identical to {@link #write(double)}.
-     */
-    public static void writeLineConsole(double output) {
-        writeLineConsole("" + output);
-    }
-
-    /**
-     * Prints a line separator in the console.
-     */
-    public static void writeLineConsole() {
-        writeLineConsole("");
-    }
-
-    /**
-     * Prints the {@link String} to the console. Does not end with a line break.
-     */
-    public static void writeConsole(String output) {
-        System.out.print(output);
-    }
-
-    /**
-     * Prints the <code>int</code> to the console. Does not end with a line break.
-     */
-    public static void writeConsole(int output) {
-        writeConsole("" + output);
-    }
-
-    /**
-     * Prints the <code>double</code> to the console. Does not end with a line
-     * break.
-     */
-    public static void writeConsole(double output) {
-        writeConsole("" + output);
-    }
-
-    public static void resetRandom() {
-        rand = null;
-    }
-
-    public static void setRandomWithSeed(int seed) throws IllegalAccessException {
-        if (rand != null) {
-            throw new IllegalAccessException("Don't touch this");
         }
-        rand = new Random(seed);
-    }
 
-    public static void setRandom() throws IllegalAccessException {
-        setRandomWithSeed(144);
-    }
+        player1Points = calculatePoints(boxes, player1Points, 1);
+        player2Points = calculatePoints(boxes, player2Points, 2);
 
-    public static int randomInt(int minval, int maxval) {
-        return minval + rand.nextInt(maxval - minval + 1);
-    }
+        System.out.println("Player 1 points: " + player1Points);
+        System.out.println("Player 2 points: " + player2Points);
 
-    public static int drawCard() {
-        return randomInt(2, 11);
-    }
-
-    public static int dice() throws IllegalAccessException {
-        if (rand == null) {
-            setRandom();
+        if (player1Points < player2Points) {
+            System.out.println("Player 1 wins!");
+        } else if (player1Points > player2Points) {
+            System.out.println("Player 2 wins!");
+        } else {
+            System.out.println("Draw!");
         }
-        return randomInt(1, 6);
+    }
+
+    public static boolean playTurn(int player, boolean[] boxes) {
+        int dice1 = MiniJava.dice();
+        int dice2 = MiniJava.dice();
+        int sum = dice1 + dice2;
+
+        System.out.println("Player " + player + " has thrown the numbers:");
+        System.out.println(dice1);
+        System.out.println(dice2);
+
+        outputBoxes(boxes);
+
+        while (true) {
+            System.out.println("Which boxes to shut by player " + player + "? (0 for no valid combination)");
+
+            System.out.print("Box 1: ");
+            int box1 = MiniJava.readInt();
+            System.out.print("Box 2: ");
+            int box2 = MiniJava.readInt();
+
+            if (box1 == 0 || box2 == 0) {
+                return false;
+            }
+
+            if (isValidMove(box1, box2, sum, boxes)) {
+                boxes[box1 - 1] = false;
+                boxes[box2 - 1] = false;
+
+                if (areAllBoxesClosed(boxes)) {
+                    return true;
+                }
+                return false;
+            }
+
+            System.out.println("Invalid combination. Try again.");
+        }
+    }
+
+    public static void outputBoxes(boolean[] boxes) {
+        System.out.print("Open boxes: ");
+        for (int i = 0; i < boxes.length; i++) {
+            System.out.print((i + 1) + ":" + boxes[i] + " ");
+        }
+        System.out.println();
+    }
+
+    public static boolean isValidMove(int box1, int box2, int sum, boolean[] boxes) {
+        return (box1 >= 1 && box1 <= 8 && box2 >= 1 && box2 <= 8 && box1 != box2 && boxes[box1 - 1] && boxes[box2 - 1] && (box1 + box2 == sum));
+    }
+
+    public static boolean areAllBoxesClosed(boolean[] boxes) {
+        for (boolean box : boxes) {
+            if (box) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static int calculatePoints(boolean[] boxes, int playerPoints, int player) {
+        int sum = 0;
+        for (int i = 0; i < boxes.length; i++) {
+            if (boxes[i]) {
+                sum += (i + 1);
+            }
+        }
+        playerPoints += sum;
+        return playerPoints;
     }
 }
