@@ -1,50 +1,49 @@
-package fop.w4pick;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.HashSet;
+import java.util.Set;
 
-public class PickSix extends MiniJava {
-    // sorting method from the lecture
-    public static int[] sort(int[] a) {
-        int[] b = new int[a.length];
-        for (int i = 0; i < a.length; ++i) {
-            // begin of insert
-            int j = 0;
-            while (j < i && a[i] > b[j]) ++j;
-            // end of locate
-            for (int k = i - 1; k >= j; --k) b[k + 1] = b[k];
-            // end of shift
-            b[j] = a[i];
-            // end of insert
+public class PasswordIterator implements Iterator<String> {
+    private final int length;
+    private final Set<String> seen;
+    private long current;
+
+    public PasswordIterator(int length) {
+        if (length < 1 || length > 9) {
+            Util.badArgument("Password length must be between 1 and 9.");
         }
-        return b;
-    } // end of sort
-
-    public static void main(String[] args) throws IllegalAccessException {
-        // TODO
+        this.length = length;
+        this.seen = new HashSet<>();
+        this.current = 0;
     }
 
-    public static void outputStapel(int[][] stapel) {
-        // TODO
+    @Override
+    public boolean hasNext() {
+        return current < Math.pow(10, length);
     }
 
-    public static int playerSelectCard(int player, int[][] playerCards) {
-        // TODO
-        return 0;
+    @Override
+    public String next() {
+        if (!hasNext()) {
+            Util.noSuchElement("No more passwords available.");
+        }
+
+        String result = null;
+        while (hasNext() && (result == null || seen.contains(result))) {
+            result = generateNextPassword();
+            current++;
+        }
+
+        if (result != null) {
+            seen.add(result);
+            return result;
+        } else {
+            Util.noSuchElement("No more passwords available.");
+            return null; // Unreachable, but required by the compiler
+        }
     }
 
-    public static int calculatePoints(int[] lostCards) {
-        // TODO
-        return 0;
-    }
-
-    public static void outputResult(int[] playerPoints) {
-        // TODO
-    }
-
-    public static int getValueOfCard(int card) {
-        // TODO
-        return 0;
-    }
-
-    public static void givePlayerCards(int[][] playerCards) throws IllegalAccessException {
-        // TODO
+    private String generateNextPassword() {
+        return Util.longToStringWithLength(current, length);
     }
 }

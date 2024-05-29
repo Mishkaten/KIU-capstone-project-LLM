@@ -1,14 +1,22 @@
-package fop.w9track;
-
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Penguin {
-    private List<Geo> locations;
     private String trackID;
+    private List<Geo> locations;
 
-    public Penguin(List<Geo> locations, String trackID) {
-        this.locations = locations;
+    public Penguin(String trackID, List<Geo> locations) {
         this.trackID = trackID;
+        this.locations = locations;
+    }
+
+    public String getTrackID() {
+        return trackID;
+    }
+
+    public List<Geo> getLocations() {
+        return locations;
     }
 
     @Override
@@ -19,16 +27,15 @@ public class Penguin {
                 '}';
     }
 
-    public List<Geo> getLocations() {
-        return locations;
-    }
-
-    public String getTrackID() {
-        return trackID;
-    }
-
     public String toStringUsingStreams() {
-        // TODO
-        return "";
+        List<Geo> sortedLocations = locations.stream()
+                .sorted(Comparator.comparing(Geo::getLatitude).reversed()
+                        .thenComparing(Geo::getLongitude).reversed())
+                .collect(Collectors.toList());
+
+        return "Penguin{" +
+                "locations=" + sortedLocations +
+                ", trackID='" + trackID + '\'' +
+                '}';
     }
 }

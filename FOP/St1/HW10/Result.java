@@ -1,54 +1,39 @@
-package fop.w10search;
-
+// Reading the content of the file Result.java
 import java.nio.file.Path;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Result {
-
     private Path file;
-    private List<Match> matches = new LinkedList<>();
+    private List<Match> matches;
 
     public Result(Path file) {
         this.file = file;
+        this.matches = new ArrayList<>();
     }
 
     public void addMatch(Match match) {
         matches.add(match);
     }
 
-    public List<Match> getMatches() {
-        return matches;
-    }
-
-    public void setMatches(List<Match> matches) {
-        this.matches = matches;
-    }
-
     public Path getFile() {
         return file;
     }
 
-    public void setFile(Path file) {
-        this.file = file;
+    public List<Match> getMatches() {
+        return matches;
     }
 
+    @Override
     public String toString() {
         if (matches.isEmpty()) {
             return "No match in file " + file;
         }
-        StringBuilder builder = new StringBuilder();
-        builder.append(matches.size());
-        builder.append(" match" + (matches.size() == 1 ? "" : "es"));
-        builder.append(" in file " + file + ".\n");
-        for (int i = 0; i < matches.size(); i++) {
-            builder.append(matches.get(i));
-            if (i != matches.size() - 1) {
-                builder.append("\n");
-            }
+        StringBuilder sb = new StringBuilder();
+        sb.append(matches.size()).append(" match").append(matches.size() > 1 ? "es" : "").append(" in file ").append(file).append(".\n");
+        for (Match match : matches) {
+            sb.append(match).append("\n");
         }
-        return builder.toString();
+        return sb.toString();
     }
-
-
 }

@@ -1,45 +1,26 @@
-package fop.w9track;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CSVReading {
-
-    private static List<PenguinData> instance = null;
-    private static final DateTimeFormatter formatter = DateTimeFormatter
-            .ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-    //files.lines
-    public static Stream<PenguinData> processInputFile() {
-        if (instance != null) {
-            return instance.stream();
-        }
-
-        List<PenguinData> inputList = new ArrayList<PenguinData>();
-        try {
-            Stream<String> lines = Files.lines(Paths.get("data",  "OC_LPhillips_LittlePenguin_GPS_tracks_DATA.csv"), StandardCharsets.US_ASCII);
-            inputList = lines.skip(1).map(mapToPenguinData).collect(Collectors.toList());
+    public static Stream<PenguinData> processInputFile(String filePath) {
+        List<PenguinData> data = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                String trackID = values[0];
+                double latitude = Double.parseDouble(values[1]);
+                double longitude = Double.parseDouble(values[2]);
+                Geo location = new Geo(latitude, longitude);
+                data.add(new PenguinData(trackID, location));
+            }
         } catch (IOException e) {
-            System.out.println("Data path seems to be wrong!");
             e.printStackTrace();
         }
-        instance = inputList;
-        return instance.stream();
+        return data.stream();
     }
-
-    private static Function<String, PenguinData> mapToPenguinData = (line) -> {
-        String[] p = line.split(","); // a CSV has comma separated lines
-        LocalDateTime dateTime = LocalDateTime.parse(p[2], formatter);
-        return new PenguinData(p[0], Integer.parseInt(p[1]), dateTime, Double.parseDouble(p[3]),
-                Double.parseDouble(p[4]), p[5], p[6], p[7], new Geo(p[8]));
-    };
 }
