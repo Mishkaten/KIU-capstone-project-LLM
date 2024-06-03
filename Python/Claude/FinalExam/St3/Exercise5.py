@@ -61,7 +61,7 @@ def test_knapsack():
     # Test Case 3
     items3 = [(15, 1), (10, 2), (8, 3), (5, 4)]
     max_weight3 = 6
-    expected_output3 = 25
+    expected_output3 = 33
     result3 = knapsack(items3, max_weight3)
     assert result3 == expected_output3, f"Test Case 3 Failed: Expected {expected_output3}, but got {result3}"
 

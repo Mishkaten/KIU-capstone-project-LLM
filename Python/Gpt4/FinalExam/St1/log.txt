@@ -1,0 +1,4 @@
+2024-06-02 14:22:10, INFO, System started
+2024-06-02 14:23:15, ERROR, An error occurred
+2024-06-02 14:24:20, WARNING, Low disk space
+2024-06-02 14:25:25, INFO, User logged in

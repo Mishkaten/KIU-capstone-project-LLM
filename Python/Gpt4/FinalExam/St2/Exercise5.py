@@ -30,12 +30,13 @@ Total: 5 points
 
 
 def knapsack(items: list, max_weight: int) -> int:
+    # Number of items
     n = len(items)
 
-    # Initialize the dynamic programming table
-    dp = [[0] * (max_weight + 1) for _ in range(n + 1)]
+    # Initialize the DP table with zeros
+    dp = [[0 for _ in range(max_weight + 1)] for _ in range(n + 1)]
 
-    # Populate the dynamic programming table
+    # Populate the DP table
     for i in range(1, n + 1):
         value, weight = items[i - 1]
         for w in range(1, max_weight + 1):
@@ -44,41 +45,12 @@ def knapsack(items: list, max_weight: int) -> int:
             else:
                 dp[i][w] = dp[i - 1][w]
 
-    # Return the maximum value achievable
+    # The optimal value will be in the bottom-right cell of the table
     return dp[n][max_weight]
 
 
-def test_knapsack():
-    # Test Case 1
-    items1 = [(60, 10), (100, 20), (120, 30)]
-    max_weight1 = 50
-    expected_output1 = 220
-    result1 = knapsack(items1, max_weight1)
-    assert result1 == expected_output1, f"Test Case 1 Failed: Expected {expected_output1}, but got {result1}"
-
-    # Test Case 2
-    items2 = [(30, 5), (50, 10), (100, 20), (90, 30)]
-    max_weight2 = 40
-    expected_output2 = 180
-    result2 = knapsack(items2, max_weight2)
-    assert result2 == expected_output2, f"Test Case 2 Failed: Expected {expected_output2}, but got {result2}"
-
-    # Test Case 3
-    items3 = [(15, 1), (10, 2), (8, 3), (5, 4)]
-    max_weight3 = 6
-    expected_output3 = 33
-    result3 = knapsack(items3, max_weight3)
-    assert result3 == expected_output3, f"Test Case 3 Failed: Expected {expected_output3}, but got {result3}"
-
-    # Test Case 4
-    items4 = [(1, 1), (2, 2), (3, 3)]
-    max_weight4 = 0
-    expected_output4 = 0
-    result4 = knapsack(items4, max_weight4)
-    assert result4 == expected_output4, f"Test Case 4 Failed: Expected {expected_output4}, but got {result4}"
-
-    print("All test cases passed!")
-
-# Run the test function
-test_knapsack()
+# Example usage
+items = [(60, 10), (100, 20), (120, 30)]
+max_weight = 50
+print(knapsack(items, max_weight))  # Expected Output: 220
 

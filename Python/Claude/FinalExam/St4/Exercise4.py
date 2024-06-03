@@ -62,44 +62,71 @@ Grading Scheme:
 Total: 10 points
 """
 
+class InsufficientFundsError(Exception):
+    """Custom exception raised when there are insufficient funds in the account."""
+    pass
+
 class BankAccount:
     def __init__(self, account_number: str, account_holder: str, initial_balance: float = 0.0):
+        """
+        Initialize a bank account with the given account number, account holder name, and an optional initial balance.
+
+        Args:
+            account_number (str): The account number.
+            account_holder (str): The name of the account holder.
+            initial_balance (float, optional): The initial balance of the account. Defaults to 0.0.
+        """
         self.account_number = account_number
         self.account_holder = account_holder
         self.balance = initial_balance
         self.transaction_history = []
 
     def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
-            self.transaction_history.append({
-                "type": "deposit",
-                "amount": amount,
-                "balance_after": self.balance
-            })
-        else:
+        """
+        Deposit the specified amount into the account and record the transaction.
+
+        Args:
+            amount (float): The amount to deposit.
+        """
+        if amount <= 0:
             raise ValueError("Deposit amount must be positive.")
+        self.balance += amount
+        self.transaction_history.append({"type": "deposit", "amount": amount, "balance_after": self.balance})
 
     def withdraw(self, amount: float):
-        if amount > 0:
-            if self.balance >= amount:
-                self.balance -= amount
-                self.transaction_history.append({
-                    "type": "withdraw",
-                    "amount": amount,
-                    "balance_after": self.balance
-                })
-            else:
-                raise ValueError("Insufficient funds.")
-        else:
+        """
+        Withdraw the specified amount from the account and record the transaction.
+
+        Args:
+            amount (float): The amount to withdraw.
+
+        Raises:
+            InsufficientFundsError: If there are insufficient funds in the account.
+        """
+        if amount <= 0:
             raise ValueError("Withdrawal amount must be positive.")
+        if self.balance < amount:
+            raise InsufficientFundsError("Insufficient funds in the account.")
+        self.balance -= amount
+        self.transaction_history.append({"type": "withdraw", "amount": amount, "balance_after": self.balance})
 
     def get_balance(self) -> float:
+        """
+        Get the current account balance.
+
+        Returns:
+            float: The current account balance.
+        """
         return self.balance
 
     def get_transaction_history(self) -> list:
-        return self.transaction_history
+        """
+        Get the transaction history of the account.
 
+        Returns:
+            list: The transaction history as a list of dictionaries.
+        """
+        return self.transaction_history
 
 
 def test_bank_account():
@@ -126,6 +153,7 @@ def test_bank_account():
     assert history[1]["type"] == "withdraw", "Transaction type is incorrect"
     assert history[1]["amount"] == 20.0, "Transaction amount is incorrect"
     assert history[1]["balance_after"] == 130.0, "Balance after transaction is incorrect"
+
 
 
     print("All tests passed!")

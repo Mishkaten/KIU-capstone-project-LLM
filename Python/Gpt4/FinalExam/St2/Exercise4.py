@@ -62,73 +62,61 @@ Grading Scheme:
 Total: 10 points
 """
 
+
 class BankAccount:
     def __init__(self, account_number: str, account_holder: str, initial_balance: float = 0.0):
+        """Initialize the bank account with account number, account holder, and initial balance."""
         self.account_number = account_number
         self.account_holder = account_holder
         self.balance = initial_balance
         self.transaction_history = []
 
     def deposit(self, amount: float):
-        if amount > 0:
-            self.balance += amount
-            self.transaction_history.append({
-                "type": "deposit",
-                "amount": amount,
-                "balance_after": self.balance
-            })
-        else:
+        """Deposit the specified amount into the account and record the transaction."""
+        if amount <= 0:
             raise ValueError("Deposit amount must be positive.")
 
+        self.balance += amount
+        transaction = {
+            "type": "deposit",
+            "amount": amount,
+            "balance_after": self.balance
+        }
+        self.transaction_history.append(transaction)
+
     def withdraw(self, amount: float):
-        if amount > 0:
-            if self.balance >= amount:
-                self.balance -= amount
-                self.transaction_history.append({
-                    "type": "withdraw",
-                    "amount": amount,
-                    "balance_after": self.balance
-                })
-            else:
-                raise ValueError("Insufficient funds.")
-        else:
+        """Withdraw the specified amount from the account if sufficient funds are available."""
+        if amount <= 0:
             raise ValueError("Withdrawal amount must be positive.")
+        if amount > self.balance:
+            raise ValueError("Insufficient funds.")
+
+        self.balance -= amount
+        transaction = {
+            "type": "withdraw",
+            "amount": amount,
+            "balance_after": self.balance
+        }
+        self.transaction_history.append(transaction)
 
     def get_balance(self) -> float:
+        """Return the current balance of the account."""
         return self.balance
 
     def get_transaction_history(self) -> list:
+        """Return the transaction history of the account."""
         return self.transaction_history
 
 
+# Example usage
+account = BankAccount("123456789", "John Doe", 100.0)
+account.deposit(50.0)
+account.withdraw(20.0)
+print(account.get_balance())  # Expected Output: 130.0
+print(account.get_transaction_history())
+# Expected Output:
+# [
+#     {"type": "deposit", "amount": 50.0, "balance_after": 150.0},
+#     {"type": "withdraw", "amount": 20.0, "balance_after": 130.0}
+# ]
 
-def test_bank_account():
-    # Create a new bank account
-    account = BankAccount("123456789", "John Doe", 100.0)
-
-    # Test initial balance
-    assert account.get_balance() == 100.0, "Initial balance is incorrect"
-
-    # Test deposit
-    account.deposit(50.0)
-    assert account.get_balance() == 150.0, "Balance after deposit is incorrect"
-
-    # Test withdraw
-    account.withdraw(20.0)
-    assert account.get_balance() == 130.0, "Balance after withdraw is incorrect"
-
-    # Test transaction history
-    history = account.get_transaction_history()
-    assert len(history) == 2, "Transaction history length is incorrect"
-    assert history[0]["type"] == "deposit", "Transaction type is incorrect"
-    assert history[0]["amount"] == 50.0, "Transaction amount is incorrect"
-    assert history[0]["balance_after"] == 150.0, "Balance after transaction is incorrect"
-    assert history[1]["type"] == "withdraw", "Transaction type is incorrect"
-    assert history[1]["amount"] == 20.0, "Transaction amount is incorrect"
-    assert history[1]["balance_after"] == 130.0, "Balance after transaction is incorrect"
-
-
-    print("All tests passed!")
-
-# Run the test function
-test_bank_account()

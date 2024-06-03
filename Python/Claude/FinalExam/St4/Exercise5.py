@@ -30,18 +30,23 @@ Total: 5 points
 
 
 def knapsack(items: list, max_weight: int) -> int:
+    # Get the number of items
     n = len(items)
 
-    # Initialize the dynamic programming table
+    # Create a dynamic programming table
     dp = [[0] * (max_weight + 1) for _ in range(n + 1)]
 
-    # Populate the dynamic programming table
+    # Iterate over the items and fill the dp table
     for i in range(1, n + 1):
         value, weight = items[i - 1]
         for w in range(1, max_weight + 1):
             if weight <= w:
+                # If the current item fits within the weight limit,
+                # choose the maximum value between including and excluding the item
                 dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - weight] + value)
             else:
+                # If the current item exceeds the weight limit,
+                # exclude the item and take the value from the previous row
                 dp[i][w] = dp[i - 1][w]
 
     # Return the maximum value achievable
@@ -81,4 +86,3 @@ def test_knapsack():
 
 # Run the test function
 test_knapsack()
-
