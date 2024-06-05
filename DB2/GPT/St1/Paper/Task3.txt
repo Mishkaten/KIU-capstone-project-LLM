@@ -1,0 +1,68 @@
+3.1
+
+The waits-for-graph is a directed graph used to represent transactions waiting for each other in the context of acquiring locks. Each node represents a transaction, and a directed edge from transaction T1 to transaction T2 indicates that T1 is waiting for T2 to release a lock.
+
+In strict 2PL (Two-Phase Locking), transactions hold all their locks until they commit or rollback. The waits-for-graph can help detect deadlocks when cycles are formed.
+
+
+Scenario Description
+Given:
+
+There are n active transactions already involved in a waits-for-graph.
+A new transaction (n+1) starts and requests an S-lock (shared lock) on an object.
+This new transaction (n+1) becomes involved in the existing waits-for-graph.
+
+
+Maximum Number of New Edges Added to the Waits-For-Graph
+When a new transaction (n+1) requests an S-lock, it will wait if there are any transactions holding X-locks (exclusive locks) on the same object. It will not wait for transactions holding S-locks since multiple transactions can hold S-locks simultaneously on the same object.
+
+
+Key Points:
+Existing Edges: The existing n transactions might already be waiting on each other in various ways, forming a complex graph.
+New Transaction Request: Transaction (n+1) requests an S-lock on an object.
+Conditions for New Edges: New edges are added if (n+1) waits for any of the n transactions currently holding X-locks on the requested object.
+
+
+Maximum New Edges: The new transaction (n+1) can wait for multiple transactions if multiple transactions hold X-locks on the requested object. In the worst-case scenario, if each of the n transactions holds an X-lock on the object, the new transaction will wait for all of them.
+Therefore, the maximum number of new edges that will be added to the waits-for-graph is n.
+
+
+Conclusion
+If transaction (n+1) requests an S-lock on an object and each of the n existing transactions holds an X-lock on that object, the maximum number of new edges added to the waits-for-graph is n. This is because transaction (n+1) will wait for each of the n transactions to release their X-locks.
+
+
+
+
+3.2
+
+Understanding the Waits-For-Graph in Strict 2PL with X-Lock Requests
+When a new transaction requests an X-lock (exclusive lock) on an object, it needs to wait until all other transactions holding S-locks (shared locks) or X-locks on the object release them. This can introduce new edges in the waits-for-graph.
+
+Scenario Description
+Given:
+
+There are n active transactions already involved in a waits-for-graph.
+A new transaction (n+1) starts and requests an X-lock on an object.
+This new transaction (n+1) becomes involved in the existing waits-for-graph.
+
+
+Maximum Number of New Edges Added to the Waits-For-Graph
+When a new transaction (n+1) requests an X-lock, it will wait for all transactions holding either S-locks or X-locks on the same object.
+
+Key Points:
+Existing Edges: The existing n transactions might already be waiting on each other in various ways, forming a complex graph.
+New Transaction Request: Transaction (n+1) requests an X-lock on an object.
+Conditions for New Edges: New edges are added if (n+1) waits for any of the n transactions currently holding S-locks or X-locks on the requested object.
+
+Maximum New Edges: The new transaction (n+1) can wait for multiple transactions if multiple transactions hold locks (either S-locks or X-locks) on the object. In the worst-case scenario, if each of the n transactions holds a lock (either S-lock or X-lock) on the object, the new transaction will wait for all of them.
+
+Therefore, the maximum number of new edges that will be added to the waits-for-graph is n.
+
+Conclusion
+If transaction (n+1) requests an X-lock on an object and each of the n existing transactions holds a lock (either S-lock or X-lock) on that object, the maximum number of new edges added to the waits-for-graph is n. This is because transaction (n+1) will wait for each of the n transactions to release their locks.
+
+
+
+
+
+

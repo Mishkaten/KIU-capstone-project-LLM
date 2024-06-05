@@ -1,0 +1,39 @@
+To extend the database with the new tables for buildings and rooms, and to implement the condition that a room in a building can only be assigned to one lesson at a specific time, you can use the following SQL script:
+
+-- Create the Building table
+CREATE TABLE Building (
+    BuildingID INT PRIMARY KEY,
+    BuildingName VARCHAR(100)
+);
+
+-- Create the Room table
+CREATE TABLE Room (
+    RoomID INT PRIMARY KEY,
+    BuildingID INT,
+    RoomNumber VARCHAR(10),
+    FOREIGN KEY (BuildingID) REFERENCES Building(BuildingID)
+);
+
+-- Create the LessonRoom table to establish the relationship between Lesson and Room
+CREATE TABLE LessonRoom (
+    LessonID INT,
+    RoomID INT,
+    FOREIGN KEY (LessonID) REFERENCES Lesson(LessonID),
+    FOREIGN KEY (RoomID) REFERENCES Room(RoomID),
+    PRIMARY KEY (LessonID, RoomID)
+);
+
+-- Implement the condition that a room can only be assigned to one lesson at a specific time
+ALTER TABLE LessonRoom
+ADD CONSTRAINT UC_LessonRoom_TimeSlot UNIQUE (RoomID, LessonID);
+
+
+Explanation:
+
+The Building table is created with a primary key BuildingID and an attribute BuildingName to store the name of the building.
+The Room table is created with a primary key RoomID, a foreign key BuildingID referencing the Building table, and an attribute RoomNumber to store the room number.
+The LessonRoom table is created to establish the relationship between the Lesson and Room tables. It has foreign keys LessonID and RoomID referencing the Lesson and Room tables, respectively. The combination of LessonID and RoomID is set as the primary key to ensure that a lesson can only be assigned to a specific room.
+To implement the condition that a room can only be assigned to one lesson at a specific time, a unique constraint UC_LessonRoom_TimeSlot is added to the LessonRoom table. This constraint ensures that the combination of RoomID and LessonID is unique, preventing multiple lessons from being assigned to the same room at the same time.
+
+Make sure to save this script in a SQL file with a .sql extension.
+Note: The script assumes that the Lesson table already exists in the database. If it doesn't, you'll need to create the Lesson table with the appropriate columns and constraints before running this script.

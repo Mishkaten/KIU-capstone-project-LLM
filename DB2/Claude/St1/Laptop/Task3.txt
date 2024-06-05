@@ -1,0 +1,58 @@
+Here's an example of addressing the points in Task 3 for a sample teacher document in MongoDB:
+
+{
+  "_id": ObjectId("64133bfa0d882a7d9c30d5e0"),
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "courses": [
+    {
+      "code": "CS101",
+      "name": "Introduction to Computer Science",
+      "students": [
+        {
+          "name": "Alice Smith",
+          "email": "alice.smith@example.com",
+          "grade": "A"
+        },
+        {
+          "name": "Bob Johnson",
+          "email": "bob.johnson@example.com",
+          "grade": "B"
+        }
+      ]
+    },
+    {
+      "code": "MATH201",
+      "name": "Calculus I",
+      "students": [
+        {
+          "name": "Charlie Brown",
+          "email": "charlie.brown@example.com",
+          "grade": "B+"
+        }
+      ]
+    }
+  ]
+}
+
+
+
+Normalization Violations:
+
+The document violates the First Normal Form (1NF) because it contains nested arrays (courses and students) within the document. In a normalized structure, each attribute should contain atomic values, and there should be no repeating groups.
+The document also violates the Second Normal Form (2NF) because it includes non-key attributes (students) that depend on a subset of the key (courses). In a normalized structure, non-key attributes should depend on the entire primary key.
+Additionally, the document violates the Third Normal Form (3NF) because it contains transitive dependencies. The students array contains student details that are not directly dependent on the teacher but rather on the courses. In a normalized structure, there should be no transitive dependencies.
+
+To retrieve the insertion time of the document, you can use the getTimestamp() method on the _id field. Here's an example of how to retrieve the insertion time:
+db.teachers.find({ "_id": ObjectId("64133bfa0d882a7d9c30d5e0") }, { "_id": 1 }).forEach(function(doc) {
+  var insertionTime = doc._id.getTimestamp();
+  print("Insertion Time:", insertionTime);
+});
+
+
+
+Output:
+Insertion Time: Mon Mar 20 2023 14:30:18 GMT+0000 (UTC)
+
+In this example, the getTimestamp() method is called on the _id field of the document to retrieve the insertion time. The insertion time is then printed to the console.
+Remember to include the sample document and the retrieved insertion time in your solution file as required by the task.

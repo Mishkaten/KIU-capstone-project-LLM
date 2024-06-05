@@ -1,0 +1,44 @@
+Understanding Write Skew in Serializable Snapshot Isolation (SSI)
+Scenario:
+There are 4 persons on duty: Alice, Bob, Joe, and Susan.
+At least 2 persons need to be on duty at all times.
+Alice and Bob each start a concurrent transaction to remove themselves from the duty list.
+How Serializable Snapshot Isolation (SSI) Works:
+PostgreSQL’s Serializable Snapshot Isolation (SSI) prevents anomalies by detecting and preventing conflicts that could lead to a write skew. In SSI, transactions operate on snapshots of the database state and detect potential conflicts through a dependency graph.
+
+Write Skew Example:
+Initial state: Alice, Bob, Joe, and Susan are on duty.
+    Concurrent transactions:
+        Transaction T1 (Alice): Alice reads the current duty list and sees Bob, Joe, and Susan are also on duty. Alice removes herself from the duty list.
+        Transaction T2 (Bob): Bob reads the current duty list and sees Alice, Joe, and Susan are also on duty. Bob removes himself from the duty list.
+Without proper concurrency control, both transactions might commit, resulting in only Joe and Susan remaining on duty, violating the constraint that at least 2 persons must be on duty.
+
+
+Hypothesis on PostgreSQL SSI Behavior:
+PostgreSQL SSI will detect the potential write skew conflict and prevent it. Here’s how it might behave:
+
+Transaction Start:
+
+T1 (Alice) and T2 (Bob) start concurrently.
+Read Phase:
+
+T1 reads the duty list (Alice, Bob, Joe, Susan).
+T2 reads the duty list (Alice, Bob, Joe, Susan).
+Write Phase:
+
+T1 attempts to remove Alice from the duty list.
+T2 attempts to remove Bob from the duty list.
+Conflict Detection:
+
+PostgreSQL detects that both T1 and T2 are making updates based on the same snapshot and that their writes could lead to a state where fewer than 2 people are on duty.
+This detection happens because both transactions are trying to write in a way that, if both committed, would violate the duty constraint.
+Conflict Resolution:
+
+PostgreSQL will prevent one of the transactions from committing to maintain database consistency.
+Typically, one of the transactions (either T1 or T2) will be rolled back or will need to be retried.
+
+
+Conclusion:
+In this scenario, PostgreSQL's SSI mechanism will prevent the write skew by detecting the conflict between the concurrent transactions of Alice and Bob. One of the transactions will be rolled back to ensure that the rule of having at least 2 persons on duty is not violated. This behavior preserves the serializability of transactions and maintains the integrity of the duty list.
+
+

@@ -1,0 +1,107 @@
+1.1
+To determine which rows are in the table after running the given commands with autocommit enabled, let's analyze each command step by step.
+
+Assuming the table "test" is initially empty, let's go through the commands:
+
+1. INSERT INTO test (name) VALUES ('Hans'); 
+   - This command inserts a new row into the "test" table with the name 'Hans'.
+   - With autocommit enabled, this change is immediately committed to the database.
+   - After this command, the table contains one row:
+     | ID | name |
+     |----|------|
+     | 1  | Hans |
+
+2. INSERT INTO test (name) VALUES ('Christoph'); 
+   - This command inserts another row into the "test" table with the name 'Christoph'.
+   - Again, with autocommit enabled, this change is immediately committed.
+   - After this command, the table contains two rows:
+     | ID | name      |
+     |----|-----------|
+     | 1  | Hans      |
+     | 2  | Christoph |
+
+3. SAVEPOINT savepoint1; 
+   - This command creates a savepoint named "savepoint1".
+   - Savepoints allow you to define points within a transaction to which you can roll back later if needed.
+   - Creating a savepoint does not affect the contents of the table.
+
+4. INSERT INTO test (name) VALUES ('Jens'); 
+   - This command inserts a new row into the "test" table with the name 'Jens'.
+   - With autocommit enabled, this change is immediately committed.
+   - After this command, the table contains three rows:
+     | ID | name      |
+     |----|-----------|
+     | 1  | Hans      |
+     | 2  | Christoph |
+     | 3  | Jens      |
+
+5. ROLLBACK TO savepoint1; 
+   - This command rolls back the transaction to the savepoint named "savepoint1".
+   - However, with autocommit enabled, each statement is committed immediately, so the rollback has no effect.
+   - The contents of the table remain unchanged.
+
+6. INSERT INTO test (name) VALUES ('Maria'); 
+   - This command inserts another row into the "test" table with the name 'Maria'.
+   - With autocommit enabled, this change is immediately committed.
+   - After this command, the table contains four rows:
+     | ID | name      |
+     |----|-----------|
+     | 1  | Hans      |
+     | 2  | Christoph |
+     | 3  | Jens      |
+     | 4  | Maria     |
+
+Therefore, after running these commands with autocommit enabled, the "test" table will contain the following rows:
+| ID | name      |
+|----|-----------|
+| 1  | Hans      |
+| 2  | Christoph |
+| 3  | Jens      |
+| 4  | Maria     |
+
+
+
+
+1.2
+When running the commands with autocommit off, the rows in the table will be different compared to the scenario with autocommit on. Let's analyze the commands step by step:
+
+1. INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+   - This command inserts a row with ID 1 and name 'Miller' into the "test" table.
+   - With autocommit off, this change is not immediately committed to the database.
+
+2. INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+   - This command inserts a row with ID 2 and name 'Neuer' into the "test" table.
+   - Again, with autocommit off, this change is not immediately committed.
+
+3. Begin;
+   - This command starts a new transaction.
+
+4. INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+   - This command inserts a row with ID 3 and name 'Doe' into the "test" table.
+   - With autocommit off and within a transaction, this change is not immediately committed.
+
+5. INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+   - This command attempts to insert a row with ID 4 and name 'Smith' into the "test" table.
+   - However, since the table already has a primary key constraint on the "ID" column, inserting a row with a duplicate ID value will violate the constraint.
+
+6. INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+   - This command also attempts to insert a row with ID 4 and name 'Summer' into the "test" table.
+   - Similar to the previous command, this will violate the primary key constraint.
+
+7. Commit;
+   - This command attempts to commit the transaction.
+   - However, due to the constraint violations in the previous two INSERT statements, the commit will fail, and the transaction will be rolled back.
+
+As a result, after running these commands with autocommit off, the "test" table will contain the following rows:
+| ID | name   |
+|----|--------|
+| 1  | Miller |
+| 2  | Neuer  |
+
+Explanation:
+- The first two INSERT statements are executed successfully, but the changes are not immediately committed due to autocommit being off.
+- The BEGIN statement starts a new transaction.
+- The third INSERT statement is executed within the transaction, but the change is not committed.
+- The fourth and fifth INSERT statements violate the primary key constraint because they attempt to insert duplicate ID values.
+- The COMMIT statement fails due to the constraint violations, and the transaction is rolled back.
+- As a result, only the changes made by the first two INSERT statements (before the transaction) are persisted in the table.

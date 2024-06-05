@@ -1,0 +1,47 @@
+2.1
+Yes, the given schedule is serializable. We can use the operations swap method to demonstrate this:
+
+Original schedule:
+Transaction T1: Read b
+Transaction T2: Read a, Write a, Read c, Write c
+Transaction T3: Read b, Read c, Write b
+
+If we swap the operations while maintaining the order within each transaction, we can obtain an equivalent serial schedule:
+
+Transaction T1: Read b
+Transaction T3: Read b, Read c, Write b  
+Transaction T2: Read a, Write a, Read c, Write c
+
+Since the swapped schedule is a serial schedule (T1, then T3, then T2 executing one after another), the original schedule is serializable.
+
+
+2.2
+Based on the transaction schedule shown in the image, under strict 2pl (two-phase locking):
+
+Transaction T1 will:
+1. Read a
+2. Write a
+
+Transaction T2 will:
+1. Read b 
+2. Write c
+
+Transaction T3 will:
+1. Read b
+2. Read c
+3. Write b
+4. Write c
+
+The transactions should execute in that order and commit/rollback as soon as possible while still following the strict 2pl protocol. This ensures that all exclusive locks are held until the transaction completes, providing a high degree of isolation between concurrent transactions.
+
+
+2.3
+The image shows a schedule under MVCC (Multi-Version Concurrency Control) Repeatable Read isolation level. It demonstrates how transactions T1, T2 and T3 can execute concurrently while maintaining a repeatable read view.
+
+Transaction T1 performs a "Read a", then a "Write a". 
+Transaction T2 performs "Read b", "Read c", "Write c".
+Transaction T3 performs "Read b", "Read c", "Write b".
+
+The repeatable read guarantee ensures that within a transaction, subsequent reads of the same data will always return the same result, even if other transactions have updated that data in the meantime. The schedule shows how T2 and T3 can read b and c concurrently, with each getting a consistent view throughout their transaction, while T1 is updating a independently.
+
+This illustrates how MVCC allows greater concurrency while still providing strong isolation between transactions. Each transaction sees a snapshot of the database as of the time it began.

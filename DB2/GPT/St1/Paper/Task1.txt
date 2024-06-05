@@ -1,0 +1,155 @@
+1)
+Initial State:
+
+Table test is created but initially empty.
+
+First Command:
+    INSERT INTO public.test (name) VALUES ('Alice');
+    After execution, table contains:
+    ID | name
+    ----|------
+    1  | Alice
+
+Second Command:
+    INSERT INTO public.test (name) VALUES ('Bob');
+    After execution, table contains:
+
+    ID | name
+    ----|------
+    1  | Alice
+    2  | Bob
+
+Third Command:
+    UPDATE public.test SET name = 'Charlie' WHERE name = 'Alice';
+    After execution, table contains:
+
+    ID | name
+    ----|------
+    1  | Charlie
+    2  | Bob
+
+Fourth Command:
+    DELETE FROM public.test WHERE name = 'Bob';
+    After execution, table contains:
+    ID | name
+    ----|------
+    1  | Charlie
+
+Fifth Command:
+
+    INSERT INTO public.test (name) VALUES ('Eve');
+    After execution, table contains:
+    ID | name
+    ----|------
+    1  | Charlie
+    3  | Eve
+
+Final State:
+    After running these commands with autocommit on, the final state of the table test will be:
+
+    ID | name
+    ----|------
+    1 | Charlie
+    3 | Eve
+
+
+
+2)
+Given Commands:
+
+INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+BEGIN;
+INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+COMMIT;
+
+Analysis:
+
+Initial State:
+
+    Table test is empty.
+
+First Command (Autocommit Mode):
+
+    INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+    This row is inserted and committed immediately.
+    Table after command:
+
+    ID | name
+    ----|-------
+    1  | Miller
+
+Second Command (Autocommit Mode):
+
+    INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+    This row is inserted and committed immediately.
+    Table after command:
+    
+    ID | name
+    ----|-------
+    1  | Miller
+    2  | Neuer
+
+
+Begin Transaction:
+
+    BEGIN;
+    No change to the table yet, but subsequent commands are now part of a transaction and will not be committed until a COMMIT statement is issued.
+
+Third Command (Transaction Mode):
+
+    INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+    This row is inserted but not yet committed.
+    Table state (uncommitted):
+
+    ID | name
+    ----|-------
+    1  | Miller
+    2  | Neuer
+    3  | Doe
+
+
+Fourth Command (Transaction Mode):
+
+    INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+    This row is inserted but not yet committed.
+    Table state (uncommitted):
+
+    ID | name
+    ----|-------
+    1  | Miller
+    2  | Neuer
+    3  | Doe
+    4  | Smith
+
+Fifth Command (Transaction Mode):
+
+    INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+    This command tries to insert a row with a duplicate ID (4).
+    This violates the primary key constraint, causing the entire transaction to fail.
+    Since autocommit is off, and this command is within an uncommitted transaction, the entire transaction is rolled back.
+    No rows from the transaction block (commands 3, 4, and 5) are inserted into the table.
+
+Commit Transaction:
+
+    COMMIT;
+    Since the transaction failed due to the primary key violation, the commit does not apply any changes from the transaction block.
+
+Final State:
+    The final state of the table test after all commands have been run with autocommit off is:
+    ID | name
+    ----|-------
+    1 | Miller
+    2 | Neuer
+
+Explanation:
+    The commands before the BEGIN statement were executed with autocommit on, so they were committed immediately.
+    The commands within the transaction block were rolled back due to a primary key violation (ID 4 already exists).
+    As a result, only the rows inserted before the transaction (Miller and Neuer) are in the table.
+
+
+
+
+

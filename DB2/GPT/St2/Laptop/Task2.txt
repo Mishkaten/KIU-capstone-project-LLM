@@ -1,0 +1,68 @@
+Here is the SQL script to extend the database with new tables for managing locations for lessons, including primary keys, foreign keys, and necessary constraints to ensure that a room in a building can only be assigned to one lesson at a specific time.
+
+-- Create the buildings table
+CREATE TABLE buildings (
+    building_id SERIAL PRIMARY KEY,
+    building_name VARCHAR(100) NOT NULL
+);
+
+-- Create the rooms table
+CREATE TABLE rooms (
+    room_id SERIAL PRIMARY KEY,
+    room_name VARCHAR(100) NOT NULL,
+    building_id INT NOT NULL,
+    FOREIGN KEY (building_id) REFERENCES buildings(building_id)
+);
+
+-- Create the lessons table
+CREATE TABLE lessons (
+    lesson_id SERIAL PRIMARY KEY,
+    lesson_time TIMESTAMP NOT NULL,
+    teacher_id INT NOT NULL,
+    student_id INT NOT NULL,
+    room_id INT NOT NULL,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(teacher_id),
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id)
+);
+
+-- Add a unique constraint to ensure a room can only be assigned to one lesson at a specific time
+ALTER TABLE lessons
+ADD CONSTRAINT unique_lesson_time_room UNIQUE (lesson_time, room_id);
+
+-- Sample data insertion (optional, for testing purposes)
+-- INSERT INTO buildings (building_name) VALUES ('Building A'), ('Building B');
+-- INSERT INTO rooms (room_name, building_id) VALUES ('Room 101', 1), ('Room 102', 1), ('Room 201', 2);
+-- INSERT INTO lessons (lesson_time, teacher_id, student_id, room_id) VALUES ('2024-06-04 10:00:00', 1, 1, 1);
+
+
+Explanation
+Buildings Table:
+
+building_id is the primary key.
+building_name is an attribute.
+Rooms Table:
+
+room_id is the primary key.
+room_name is an attribute.
+building_id is a foreign key referencing the buildings table.
+Lessons Table:
+
+lesson_id is the primary key.
+lesson_time is an attribute to store the lesson time.
+teacher_id is a foreign key referencing the teachers table.
+student_id is a foreign key referencing the students table.
+room_id is a foreign key referencing the rooms table.
+Unique Constraint:
+
+A unique constraint is added to the lessons table to ensure that a specific room can only be assigned to one lesson at a specific time.
+SQL File
+Save the above script as extend_lesson_database.sql.
+
+This script creates the necessary tables and enforces the condition that at a specific lesson time, a room in a building can only be assigned to one lesson (timeslot/teacher/student combination).
+
+
+
+
+
+

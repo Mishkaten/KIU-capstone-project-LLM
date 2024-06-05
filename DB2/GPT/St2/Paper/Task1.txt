@@ -1,0 +1,159 @@
+1.1
+To determine which rows are in the table after running the specified commands with autocommit on, let's consider the behavior of each SQL statement in the sequence. I'll outline the scenario step-by-step:
+
+Given Table Definition
+CREATE TABLE IF NOT EXISTS public.test (
+    "ID" integer NOT NULL DEFAULT nextval('"person_ID_seq"'::regclass),
+    name character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT person_pkey PRIMARY KEY ("ID")
+);
+
+
+Commands Executed with Autocommit On
+Assuming the sequence of commands executed is:
+
+-- Command 1
+INSERT INTO public.test (name) VALUES ('Alice');
+
+-- Command 2
+INSERT INTO public.test (name) VALUES ('Bob');
+
+-- Command 3
+DELETE FROM public.test WHERE name = 'Alice';
+
+-- Command 4
+INSERT INTO public.test (name) VALUES ('Charlie');
+
+Autocommit Mode
+When autocommit mode is enabled, each SQL statement is automatically committed immediately after it is executed. This means each statement is executed as an independent transaction.
+
+Execution and Resulting Rows
+Command 1:
+INSERT INTO public.test (name) VALUES ('Alice');
+
+This command inserts a new row with the name 'Alice'.
+The row inserted: { ID: 1, name: 'Alice' } (assuming '1' is the ID assigned by the sequence).
+
+
+Command 2:
+INSERT INTO public.test (name) VALUES ('Bob');
+This command inserts a new row with the name 'Bob'.
+The row inserted: { ID: 2, name: 'Bob' } (assuming '2' is the ID assigned by the sequence).
+
+
+Command 3:
+DELETE FROM public.test WHERE name = 'Alice';
+This command deletes the row where the name is 'Alice'.
+The row { ID: 1, name: 'Alice' } is deleted.
+
+
+
+Command 4:
+INSERT INTO public.test (name) VALUES ('Charlie');
+This command inserts a new row with the name 'Charlie'.
+The row inserted: { ID: 3, name: 'Charlie' } (assuming '3' is the ID assigned by the sequence).
+
+
+Final State of the Table
+After executing all commands with autocommit on, the resulting rows in the public.test table will be:
+SELECT * FROM public.test;
+
+ID	name
+2	Bob
+3	Charlie
+
+
+Summary
+The table will contain two rows after the execution of the given commands:
+
+{ ID: 2, name: 'Bob' }
+{ ID: 3, name: 'Charlie' }
+
+
+
+
+
+
+1.2
+When autocommit is off, SQL statements are not automatically committed after execution. Instead, they must be explicitly committed using the COMMIT command. Here’s the detailed explanation of what happens when you run the provided commands with autocommit off:
+
+Given Table Definition
+CREATE TABLE IF NOT EXISTS public.test (
+    "ID" integer NOT NULL DEFAULT nextval('"person_ID_seq"'::regclass),
+    name character varying(30) COLLATE pg_catalog."default",
+    CONSTRAINT person_pkey PRIMARY KEY ("ID")
+);
+
+
+Commands Executed with Autocommit Off
+Assuming the table is empty before running the commands:
+
+-- Command 1
+INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+
+-- Command 2
+INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+
+-- Start transaction
+BEGIN;
+
+-- Command 3
+INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+
+-- Command 4
+INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+
+-- Command 5 (This will cause a primary key violation error)
+INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+
+-- Commit transaction
+COMMIT;
+
+
+Explanation
+Commands 1 and 2:
+
+These commands are executed outside of the transaction block and will be immediately committed because autocommit is off but we haven't started the transaction yet.
+The table after these commands:
+SELECT * FROM public.test;
+
+ID	name
+1	Miller
+2	Neuer
+
+
+BEGIN:
+
+This starts a new transaction. The following commands will be part of this transaction.
+Command 3:
+
+This inserts a new row with ID 3 and name 'Doe'. Since the transaction has not been committed yet, this row is not visible outside the transaction.
+Command 4:
+
+This inserts a new row with ID 4 and name 'Smith'. Similarly, this row is not yet visible outside the transaction.
+Command 5:
+
+This attempts to insert a new row with ID 4 and name 'Summer'. However, this will cause a primary key violation error because a row with ID 4 already exists within this transaction. Since the primary key constraint is violated, this entire transaction will fail and none of its operations will be committed.
+COMMIT:
+
+Because the transaction encountered an error, it will not reach the commit stage successfully. Therefore, none of the operations within the transaction block (inserts with IDs 3, 4, and the duplicate 4) will be committed to the database.
+Final State of the Table
+After executing all the commands with autocommit off, only the operations that were outside the transaction block will be committed. The rows inserted within the transaction block will not be committed due to the primary key violation.
+SELECT * FROM public.test;
+
+ID	name
+1	Miller
+2	Neuer
+
+Summary
+With autocommit off, and assuming the table is initially empty, the final state of the public.test table after running the given commands will be:
+
+{ ID: 1, name: 'Miller' }
+{ ID: 2, name: 'Neuer' }
+The rows attempted to be inserted within the transaction block are not present due to the transaction failure caused by the primary key constraint violation.
+
+
+
+
+
+

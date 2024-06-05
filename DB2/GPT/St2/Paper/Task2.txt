@@ -1,0 +1,155 @@
+2.1
+To determine if the given schedule is serializable, we can use the operations swap method. The goal is to see if we can transform the given schedule into a serial schedule by swapping non-conflicting operations.
+
+Step-by-Step Swapping:
+Initial Schedule:
+
+T2: Read a, Write a
+T1: Read b
+T2: Read c
+T3: Read b, Read c
+T2: Write c
+T3: Write b
+Step 1: Move Read b of T1 up
+
+T1: Read b
+T2: Read a, Write a
+T2: Read c
+T3: Read b, Read c
+T2: Write c
+T3: Write b
+We can't move Read b of T1 before Read a and Write a of T2, because they are non-conflicting operations on different data items.
+
+Step 2: Move Read b of T3 down
+
+T1: Read b
+T2: Read a, Write a
+T2: Read c
+T3: Read c
+T2: Write c
+T3: Read b, Write b
+Step 3: Move Read c of T3 down
+
+T1: Read b
+T2: Read a, Write a
+T2: Read c
+T2: Write c
+T3: Read b, Write b
+T3: Read c
+Final Schedule:
+
+T1: Read b
+T2: Read a, Write a, Read c, Write c
+T3: Read b, Write b, Read c
+
+
+
+The final schedule is now a serial schedule: T1, T2, and T3 are executed one after another without interleaving operations on the same data items. This means the given schedule is serializable.
+
+Conclusion:
+By swapping non-conflicting operations, we have transformed the given schedule into a serial schedule. Therefore, the given schedule is serializable.
+
+
+
+
+
+2.2
+To execute the schedule under strict two-phase locking (2PL), we need to follow the strict 2PL rules:
+
+A transaction must acquire a lock on a data item before reading or writing it.
+It must hold all locks until it commits or rolls back.
+A transaction releases all its locks only after it has committed or rolled back.
+Here’s how the schedule would look under strict 2PL, with transactions committing/rolling back as soon as possible:
+
+Execution under Strict 2PL
+Transaction T2:
+
+Read a: T2 acquires a read lock on a.
+Write a: T2 upgrades to a write lock on a.
+T2 commits and releases the lock on a.
+Transaction T1:
+
+Read b: T1 acquires a read lock on b.
+Transaction T3:
+
+Read b: T3 waits because T1 has a read lock on b.
+Read c: T3 acquires a read lock on c.
+Write b: T3 waits because T1 has a read lock on b.
+Transaction T2:
+
+Read c: T2 acquires a read lock on c.
+Write c: T2 upgrades to a write lock on c.
+T2 commits and releases the lock on c.
+Transaction T3:
+
+Write b: T3 acquires a write lock on b after T1 releases the read lock on b.
+T3 commits and releases the lock on b.
+Resulting Schedule in Strict 2PL
+Transaction T1	Transaction T2	Transaction T3	Strict 2PL
+                Read a		                    T2 locks a (R)
+                Write a		                    T2 locks a (W)
+                                                T2 commits,
+                                                T2 releases a
+Read b			                                T1 locks b (R)
+                                                T1 releases b
+                Read c		                    T3 locks c (R)
+                                Read b          T3 waits for b
+                                Read c	
+                Write c		                    T3 upgrades to
+                                                lock c (W)
+                                                T3 commits,
+                                                T3 releases c
+                                Write b	        T3 locks b (W)
+                                                T3 commits,
+                                                T3 releases b
+
+The table in the "Strict 2PL" column represents the actual lock acquisition, waiting, and release process for each operation according to the strict 2PL protocol. Transactions commit and release their locks as soon as they complete their operations.
+
+
+
+
+
+
+
+2.3
+To execute the schedule under MVCC (Multi-Version Concurrency Control) with the Repeatable Read isolation level, we need to understand how MVCC works. MVCC ensures that each transaction sees a consistent snapshot of the database as it existed at the start of the transaction, even if other transactions are making changes concurrently. This means that reads within a transaction are repeatable and will always return the same data they read earlier.
+
+Here's how the schedule would look under MVCC with Repeatable Read, with transactions committing/rolling back as soon as possible:
+
+
+Execution under MVCC Repeatable Read
+Transaction T2:
+
+Read a: T2 reads the current version of a.
+Write a: T2 updates a. A new version of a is created.
+Transaction T1:
+
+Read b: T1 reads the current version of b.
+Transaction T3:
+
+Read b: T3 reads the version of b that was current at the start of T3.
+Read c: T3 reads the version of c that was current at the start of T3.
+Transaction T2:
+
+Read c: T2 reads the current version of c.
+Write c: T2 updates c. A new version of c is created.
+T2 commits. The changes made by T2 are now visible to other transactions starting after T2 commits.
+Transaction T3:
+
+Write b: T3 writes a new version of b.
+T3 commits. The changes made by T3 are now visible to other transactions starting after T3 commits.
+
+
+
+Resulting Schedule in MVCC Repeatable Read
+Transaction T1	Transaction T2	Transaction T3	MVCC Repeatable Read
+Read a		T2 reads a
+Write a		T2 writes a (new version)
+Read b			T1 reads b
+Read c		T2 reads c
+Read b	T3 reads old version of b
+Read c	T3 reads c
+Write c		T2 writes c (new version)
+T2 commits
+Write b	T3 writes b (new version)
+T3 commits

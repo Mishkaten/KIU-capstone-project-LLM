@@ -1,0 +1,59 @@
+To investigate how Postgres handles write skew in the given scenario using serializable snapshot isolation (SSI), let's run the example in two concurrent transactions and observe the behavior. Here's how we can set up the experiment:
+
+Create a table to represent the persons on duty:
+
+CREATE TABLE persons_on_duty (
+  name VARCHAR(50) PRIMARY KEY
+);
+
+INSERT INTO persons_on_duty VALUES ('Alice'), ('Bob'), ('Joe'), ('Susan');
+
+Open two separate Postgres sessions and start concurrent transactions:
+
+Session 1:
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT txid_current(); -- Transaction ID: 1000
+
+Session 2:
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+SELECT txid_current(); -- Transaction ID: 1001
+
+
+In each session, check the number of persons on duty and remove a person if there are more than 2:
+
+Session 1:
+SELECT COUNT(*) FROM persons_on_duty; -- Returns 4
+DELETE FROM persons_on_duty WHERE name = 'Alice';
+
+Session 2:
+SELECT COUNT(*) FROM persons_on_duty; -- Returns 4
+DELETE FROM persons_on_duty WHERE name = 'Bob';
+
+Commit the transactions:
+
+Session 1:
+COMMIT;
+
+Session 2:
+COMMIT;
+
+
+
+Outcome:
+In this scenario, Postgres SSI detects a potential write skew and aborts one of the transactions to maintain serializability. The transaction with ID 1001 (Session 2) will be aborted with an error message similar to:
+
+
+ERROR:  could not serialize access due to read/write dependencies among transactions
+DETAIL:  Reason code: Canceled on identification as a pivot, during commit attempt.
+HINT:  The transaction might succeed if retried.
+
+
+The transaction with ID 1000 (Session 1) will commit successfully.
+Explanation:
+Postgres SSI uses a combination of snapshot isolation and additional checks to detect and prevent write skews. In this case, both transactions read the initial state of the persons_on_duty table, seeing 4 persons on duty. They both independently decide to remove a person based on the condition that there are more than 2 persons on duty.
+However, if both transactions were allowed to commit, it would result in a write skew, violating the business rule that a minimum of 2 persons must be on duty. Postgres SSI detects this potential write skew by tracking read-write dependencies between transactions. When the second transaction attempts to commit, Postgres identifies it as a pivot transaction and aborts it to maintain serializability.
+After the transactions have committed (or aborted), we can examine the Xmin and Xmax values of the accessed rows:
+SELECT name, xmin, xmax FROM persons_on_duty;
+
+The output will show that the row for 'Alice' has an Xmax value corresponding to the transaction ID of the committed transaction (1000), indicating that it was deleted. The rows for 'Joe' and 'Susan' will have Xmax set to 0, indicating they are still active. The row for 'Bob' will remain unchanged since the transaction that attempted to delete it was aborted.
+In summary, Postgres SSI successfully detects and prevents write skews by aborting one of the transactions, ensuring that the business rule of maintaining a minimum of 2 persons on duty is not violated.

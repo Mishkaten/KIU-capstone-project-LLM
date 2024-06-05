@@ -1,0 +1,111 @@
+Example Document from Teacher Collection
+Let's assume we have a document in the teacher collection as follows:
+
+{
+    "_id": ObjectId("60a7b9f1f9e5a2c48c8b4567"),
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "subjects": ["Math", "Physics"],
+    "address": {
+        "street": "123 Main St",
+        "city": "Springfield",
+        "state": "IL",
+        "zip": "62704"
+    },
+    "lessons": [
+        {
+            "lesson_id": ObjectId("60a7c9f1f9e5a2c48c8b4568"),
+            "lesson_time": "2024-06-04T10:00:00Z",
+            "student_id": ObjectId("60a7d9f1f9e5a2c48c8b4569"),
+            "subject": "Math"
+        },
+        {
+            "lesson_id": ObjectId("60a7e9f1f9e5a2c48c8b456a"),
+            "lesson_time": "2024-06-04T12:00:00Z",
+            "student_id": ObjectId("60a7f9f1f9e5a2c48c8b456b"),
+            "subject": "Physics"
+        }
+    ],
+    "insertion_time": ISODate("2024-06-01T12:00:00Z")
+}
+
+
+Normalization Concepts Violated
+Redundancy:
+
+The lessons array stores information about lessons directly within the teacher document. If multiple teachers teach the same lesson, this data is duplicated across multiple documents.
+Violates the concept of First Normal Form (1NF) which requires that all fields contain only atomic values and that each record needs to be unique.
+Partial Dependencies:
+
+Fields within the lessons array, such as student_id, lesson_time, and subject, are dependent on lesson_id and not directly on the teacher document.
+Violates Second Normal Form (2NF) as there are partial dependencies within the nested arrays, where some attributes depend only on a part of the primary key of the embedded documents.
+Transitive Dependencies:
+
+The address object has fields that are dependent on address and not directly on the teacher document.
+Violates Third Normal Form (3NF) as there are transitive dependencies, meaning non-key attributes depend on other non-key attributes.
+
+
+Retrieving the Insertion Time of the Document
+To retrieve the insertion time of the document, we can query the MongoDB collection and extract the relevant field
+
+// Assuming the use of MongoDB shell or a JavaScript environment for MongoDB
+
+// Retrieve the document by its _id
+db.teacher.find(
+    { "_id": ObjectId("60a7b9f1f9e5a2c48c8b4567") },
+    { "insertion_time": 1, "_id": 0 }
+).pretty();
+
+
+This query will output the insertion time of the document:
+
+{
+    "insertion_time": ISODate("2024-06-01T12:00:00Z")
+}
+
+
+Solution Summary
+Document with Violations:
+
+{
+    "_id": ObjectId("60a7b9f1f9e5a2c48c8b4567"),
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "subjects": ["Math", "Physics"],
+    "address": {
+        "street": "123 Main St",
+        "city": "Springfield",
+        "state": "IL",
+        "zip": "62704"
+    },
+    "lessons": [
+        {
+            "lesson_id": ObjectId("60a7c9f1f9e5a2c48c8b4568"),
+            "lesson_time": "2024-06-04T10:00:00Z",
+            "student_id": ObjectId("60a7d9f1f9e5a2c48c8b4569"),
+            "subject": "Math"
+        },
+        {
+            "lesson_id": ObjectId("60a7e9f1f9e5a2c48c8b456a"),
+            "lesson_time": "2024-06-04T12:00:00Z",
+            "student_id": ObjectId("60a7f9f1f9e5a2c48c8b456b"),
+            "subject": "Physics"
+        }
+    ],
+    "insertion_time": ISODate("2024-06-01T12:00:00Z")
+}
+
+
+Insertion Time:
+{
+    "insertion_time": ISODate("2024-06-01T12:00:00Z")
+}
+
+
+This solution explains the normalization concepts violated by the document, retrieves the insertion time, and includes the document and insertion time in the solution.
+
+
+
+
+
+
