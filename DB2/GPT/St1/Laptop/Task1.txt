@@ -1,0 +1,98 @@
+To verify the hypothesis that PostgreSQL's SSI mechanism will prevent the write skew, we need to simulate the given scenario using two concurrent transactions in PostgreSQL. Below is the step-by-step process, including the SQL commands and the transaction IDs.
+
+Setup
+First, let's create a table to represent the duty list and insert the initial data.
+
+-- Create table
+CREATE TABLE duty_list (
+    name VARCHAR(50) PRIMARY KEY
+);
+
+-- Insert initial data
+INSERT INTO duty_list (name) VALUES
+('Alice'),
+('Bob'),
+('Joe'),
+('Susan');
+
+
+
+Concurrent Transactions
+We will run two concurrent transactions to simulate Alice and Bob attempting to remove themselves from the duty list.
+
+Transaction T1 (Alice)
+-- Start Transaction T1
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Alice reads the duty list
+SELECT * FROM duty_list;
+
+-- Alice removes herself from the duty list
+DELETE FROM duty_list WHERE name = 'Alice';
+
+-- Attempt to commit T1
+COMMIT;
+
+
+Transaction T2 (Bob)
+-- Start Transaction T2
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Bob reads the duty list
+SELECT * FROM duty_list;
+
+-- Bob removes himself from the duty list
+DELETE FROM duty_list WHERE name = 'Bob';
+
+-- Attempt to commit T2
+COMMIT;
+
+
+Running Transactions in PostgreSQL
+To verify the behavior, open two PostgreSQL sessions and run the above transactions simultaneously.
+
+Expected Behavior
+PostgreSQL should detect the conflict between T1 and T2 when they both try to commit, as their actions would lead to fewer than two people on duty. One of the transactions should be rolled back to maintain consistency.
+
+Checking Transaction IDs and Xmin, Xmax
+After running the transactions, we can check the transaction IDs and the visibility information (Xmin, Xmax) of the rows.
+
+
+Checking Transaction IDs
+-- In each session, check the transaction ID
+SELECT txid_current();
+
+
+-- Check Xmin and Xmax of the rows in duty_list
+SELECT name, xmin, xmax FROM duty_list;
+
+
+Example Output
+Assume that the transactions were executed, and PostgreSQL detected the write skew. One of the transactions, say T2, was rolled back. The final state of the duty_list would still have Alice, Joe, and Susan, but without Bob.
+
+-- Final state of duty_list
+SELECT * FROM duty_list;
+
+-- Output
+ name
+-------
+ Alice
+ Joe
+ Susan
+(3 rows)
+
+-- Xmin, Xmax of the rows
+SELECT name, xmin, xmax FROM duty_list;
+
+ name  | xmin | xmax
+-------+------+------
+ Alice | 1234 | 0
+ Joe   | 1234 | 0
+ Susan | 1234 | 0
+(3 rows)
+
+
+In this example, xmin represents the transaction ID when the row was inserted, and xmax would be 0, indicating the row is still valid and hasn't been deleted.
+
+Conclusion
+By running the transactions and observing the results, we can confirm that PostgreSQL's SSI mechanism prevents write skew by rolling back one of the conflicting transactions. This ensures that at least two people remain on duty, maintaining the integrity of the system.

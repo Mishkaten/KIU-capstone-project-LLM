@@ -1,0 +1,35 @@
+3.1
+To determine the maximum number of new edges that will be added to the waits-for-graph when another concurrent transaction (n+1) starts and requests a shared lock (s-lock) on an object, let's consider the worst-case scenario.
+
+In the worst case, the new transaction (n+1) will have to wait for all the existing transactions in the waits-for-graph to release their locks on the object it wants to access with a shared lock. This scenario would occur if all the existing transactions hold exclusive locks (x-locks) on the object.
+
+Given:
+- There are n active transactions already involved in the waits-for-graph.
+- A new transaction (n+1) starts and requests an s-lock on an object.
+
+The maximum number of new edges that will be added to the waits-for-graph is equal to the number of existing transactions that the new transaction (n+1) has to wait for.
+
+In the worst case, the new transaction (n+1) will have to wait for all n existing transactions. This means that there will be an edge from the new transaction (n+1) to each of the n existing transactions in the waits-for-graph.
+
+Therefore, the maximum number of new edges added to the waits-for-graph is n.
+
+
+3.2
+In the given scenario, a new transaction enters the system and requests an exclusive lock (x-lock) on an object. As a result, this transaction gets involved in the existing waits-for graph. The maximum number of new edges that can be added to the waits-for graph depends on the relationship between the new transaction and the existing transactions in the graph.
+
+Let's analyze the problem:
+- There are n active transactions already involved in the waits-for graph.
+- A new transaction enters and requests an x-lock on an object.
+
+The maximum number of new edges that can be added to the waits-for graph occurs when the new transaction is blocked by all the existing transactions and, in turn, blocks all the existing transactions.
+
+In this scenario:
+1. The new transaction will have an incoming edge from each of the n existing transactions, as it is blocked by all of them. This adds n new edges to the graph.
+2. The new transaction will have an outgoing edge to each of the n existing transactions, as it blocks all of them. This adds another n new edges to the graph.
+
+Therefore, the maximum number of new edges that can be added to the waits-for graph is:
+* Maximum new edges = Incoming edges + Outgoing edges
+* Maximum new edges = n + n
+* Maximum new edges = 2n
+
+So, when a new transaction enters the system and requests an x-lock on an object, getting involved in the existing waits-for graph, the maximum number of new edges that can be added to the graph is 2n, where n is the number of active transactions already involved in the waits-for graph.

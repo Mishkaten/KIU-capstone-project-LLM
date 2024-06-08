@@ -6,7 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/FOP/Claude" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/FOP/Gemini" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="openjdk-21" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (API24)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

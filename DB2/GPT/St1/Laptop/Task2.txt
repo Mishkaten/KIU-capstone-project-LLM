@@ -1,0 +1,58 @@
+Extending the Database for Lesson Locations
+To extend the database to manage lesson locations with buildings and rooms, and to implement the condition that at a specific lesson time, a room in a building can only be assigned to one lesson (timeslot/teacher/student combination), we will follow these steps:
+
+Create new tables for buildings and rooms.
+Extend the existing lessons table to include references to these new tables.
+Add foreign keys to ensure referential integrity.
+Implement a unique constraint to ensure that a room can only be assigned to one lesson at a specific time.
+
+
+
+SQL Script
+Here's the SQL script to create and alter the necessary tables and constraints:
+-- Create Buildings table
+CREATE TABLE buildings (
+    building_id SERIAL PRIMARY KEY,
+    building_name VARCHAR(100) NOT NULL
+);
+
+-- Create Rooms table
+CREATE TABLE rooms (
+    room_id SERIAL PRIMARY KEY,
+    room_number VARCHAR(50) NOT NULL,
+    building_id INTEGER NOT NULL,
+    FOREIGN KEY (building_id) REFERENCES buildings(building_id)
+);
+
+-- Assume there is already a Lessons table, now we alter it
+-- Add foreign keys to link to buildings and rooms
+ALTER TABLE lessons
+ADD COLUMN building_id INTEGER,
+ADD COLUMN room_id INTEGER,
+ADD FOREIGN KEY (building_id) REFERENCES buildings(building_id),
+ADD FOREIGN KEY (room_id) REFERENCES rooms(room_id);
+
+-- Add a unique constraint to ensure that at a specific lesson time,
+-- a room in a building can only be assigned to one lesson (timeslot/teacher/student combination)
+ALTER TABLE lessons
+ADD CONSTRAINT unique_lesson_assignment UNIQUE (timeslot, building_id, room_id);
+
+
+
+
+
+Explanation
+Buildings Table: Stores information about buildings.
+
+building_id: Primary key.
+building_name: Name of the building.
+Rooms Table: Stores information about rooms within buildings.
+
+room_id: Primary key.
+room_number: Room number or name.
+building_id: Foreign key referencing buildings.
+Lessons Table Alterations: Assumes the existence of a lessons table. The table is extended with:
+
+building_id: Foreign key referencing buildings.
+room_id: Foreign key referencing rooms.
+unique_lesson_assignment: Ensures that a specific combination of timeslot, building_id, and room_id is unique, thus enforcing the requirement that a room can only be assigned to one lesson at a specific time.

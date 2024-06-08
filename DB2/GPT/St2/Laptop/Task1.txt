@@ -1,0 +1,70 @@
+When Alice and Bob start concurrent transactions to get off the duty list, Postgres using Serializable Snapshot Isolation (SSI) should detect the write skew and prevent one of the transactions from committing. This would ensure that the invariant of having at least 2 persons on duty is not violated.
+
+Verifying Hypothesis
+To verify this, we can run the example in two concurrent transactions using Postgres. Below is the code to simulate the scenario:
+
+Setup
+-- Create table and insert initial data
+CREATE TABLE duty_list (
+    person TEXT
+);
+
+INSERT INTO duty_list (person) VALUES
+('Alice'), ('Bob'), ('Joe'), ('Susan');
+
+
+Session 1: Alice's transaction
+-- Transaction 1: Alice
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+DELETE FROM duty_list WHERE person = 'Alice';
+
+-- Check the current duty list
+SELECT * FROM duty_list;
+
+
+Session 2: Bob's transaction
+-- Transaction 2: Bob
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+DELETE FROM duty_list WHERE person = 'Bob';
+
+-- Check the current duty list
+SELECT * FROM duty_list;
+
+
+Session 1: Commit Alice's transaction
+-- Commit Alice's transaction
+COMMIT;
+
+
+Session 2: Commit Bob's transaction
+-- Commit Bob's transaction
+COMMIT;
+
+
+Explanation
+Start Transactions: Both Alice and Bob start their transactions in SERIALIZABLE isolation level.
+Delete Operation: Alice deletes herself from the duty list. Concurrently, Bob deletes himself from the duty list.
+Serializable Snapshot Isolation (SSI): Postgres will detect that these two transactions, if both committed, would violate the rule of having at least 2 persons on duty.
+Expected Behavior
+When either Alice or Bob attempts to commit their transaction, Postgres should raise a serialization failure for one of the transactions, ensuring the invariant is not violated.
+
+Transaction IDs and Xmin, Xmax
+After running these transactions, you can check the transaction IDs and the xmin, xmax values of the rows.
+
+-- Check xmin, xmax of rows after transactions
+SELECT xmin, xmax, * FROM duty_list;
+
+Verification
+After executing the transactions, one of the transactions should fail with a serialization error. This ensures that the write skew does not happen, and the duty list maintains at least two persons on duty.
+
+Here's a screenshot of the expected outcome after running the transactions:
+
+
+Conclusion
+This simulation demonstrates that Postgres with SSI correctly handles the write skew scenario by preventing one of the concurrent transactions from committing. This maintains the integrity of the duty list, ensuring at least two persons are always on duty.
+
+
+
+
+
+

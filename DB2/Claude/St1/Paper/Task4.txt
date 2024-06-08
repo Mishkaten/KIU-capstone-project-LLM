@@ -1,0 +1,21 @@
+In the given scenario, PostgreSQL's Serializable Snapshot Isolation (SSI) will detect a potential write skew and take appropriate action to maintain serializability.
+
+Here's how SSI would behave in this case:
+
+1. Alice and Bob start concurrent transactions to get off the duty list.
+
+2. Each transaction reads the current state of the duty list, which shows 4 persons on duty (Alice, Bob, Joe, and Susan).
+
+3. Alice's transaction removes herself from the duty list, leaving 3 persons on duty. Similarly, Bob's transaction removes himself from the duty list, also leaving 3 persons on duty.
+
+4. At this point, both transactions have read the initial state of the duty list and made modifications based on that state.
+
+5. When the transactions attempt to commit, PostgreSQL's SSI mechanism kicks in. It detects that both transactions read the same initial state (4 persons on duty) and made decisions based on that state, but the final state of the database would be different if the transactions were executed serially (i.e., one after the other).
+
+6. SSI detects this potential write skew because if the transactions were executed serially, the second transaction would have seen only 3 persons on duty and might have made a different decision (e.g., not allowing the person to get off duty as it would violate the minimum requirement of 2 persons on duty).
+
+7. To maintain serializability and prevent the write skew, SSI will force one of the transactions to abort and roll back its changes. The aborted transaction will need to be retried.
+
+My hypothesis is that PostgreSQL's SSI will successfully detect the potential write skew in this scenario and abort one of the transactions to maintain serializability. It will ensure that the final state of the database is consistent with a serial execution of the transactions, preventing any inconsistencies that could arise from the write skew.
+
+SSI achieves this by keeping track of the read and write operations performed by each transaction and analyzing their dependencies. By detecting potential conflicts and aborting transactions when necessary, SSI maintains serializability while allowing for a higher level of concurrency compared to traditional two-phase locking (2PL) mechanisms.
