@@ -1,0 +1,14 @@
+Assuming PostgreSQL chooses to abort Bob's transaction to resolve the write skew, here's the breakdown:
+Serialization Error:
+	•	Yes, a serialization error was thrown. Specifically, Bob's transaction encountered a serialization_failure error due to the write skew conflict with Alice's transaction.
+Transaction Order:
+	•	The transactions do not strictly follow each other. They execute concurrently, but SSI detects the potential conflict and intervenes before both commits are finalized.
+Commits and Rollbacks:
+	•	Alice's transaction commits successfully. Her change to remove herself from the duty list is applied.
+	•	Bob's transaction rolls back. His attempted change to remove himself is discarded, and the database state is restored to how it was before his transaction began.
+Xmin and Xmax Values:
+	•	Xmin: The xmin value of the relevant row(s) in the duty_list table may remain unchanged if no rows were deleted before the conflict. It represents the transaction ID of the transaction that originally inserted or last modified the row.
+	•	Xmax: After Alice's commit, the xmax value of the updated row (where Alice is removed) will be updated to the transaction ID of Alice's transaction. This indicates that her transaction was the last to modify the row.
+Caveats:
+	•	It's important to note that the choice of which transaction to abort (Alice or Bob) is not deterministic. PostgreSQL's internal algorithms could have chosen to abort Alice's transaction instead.
+	•	This analysis assumes a simplified scenario with only two concurrent transactions. In more complex cases, multiple conflicts could arise, and the resolution might involve cascading rollbacks. pen_spark    
