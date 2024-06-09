@@ -1,0 +1,23 @@
+1. Autocommit On:
+	•	Rows after commands:
+	◦	(1, 'Miller')
+	◦	(2, 'Neuer')
+	◦	(3, 'Doe')
+	◦	(4, 'Summer')
+	•	Explanation:
+	◦	With autocommit enabled, each statement is treated as a separate transaction.
+	◦	The first two INSERT statements are committed immediately.
+	◦	The BEGIN starts a new transaction.
+	◦	The three INSERT statements within the transaction are committed together at the COMMIT.
+	◦	The duplicate INSERT with ID=4 results in an error, and since the last insert was 'Summer', 'Smith' is not inserted.
+2. Autocommit Off (Bonus):
+	•	Rows after commands:
+	◦	(1, 'Miller')
+	◦	(2, 'Neuer')
+	•	Explanation:
+	◦	With autocommit disabled, all statements are part of the same transaction until a COMMIT or ROLLBACK is issued.
+	◦	The first two INSERT statements are executed but not committed.
+	◦	The BEGIN is redundant as a transaction is already in progress.
+	◦	The three INSERT statements are executed but not committed.
+	◦	The COMMIT commits the entire transaction including the insert with the duplicate ID, resulting in an error and the entire transaction is rolled back.
+	◦	Only the first two inserts are retained.
