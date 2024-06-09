@@ -1,0 +1,49 @@
+-- Building Table
+CREATE TABLE Building (
+    BuildingID SERIAL PRIMARY KEY,
+    BuildingName VARCHAR(100) NOT NULL
+);
+
+-- Room Table
+CREATE TABLE Room (
+    RoomID SERIAL PRIMARY KEY,
+    BuildingID INTEGER REFERENCES Building(BuildingID) NOT NULL,
+    RoomNumber VARCHAR(10) NOT NULL
+);
+
+-- Assuming you already have tables for Lesson, Teacher, and Student with appropriate IDs.
+
+-- LessonSchedule Table (to track assigned rooms and timeslots)
+CREATE TABLE LessonSchedule (
+    LessonID INTEGER REFERENCES Lesson(LessonID) NOT NULL,
+    RoomID INTEGER REFERENCES Room(RoomID) NOT NULL,
+    Timeslot TIMESTAMP NOT NULL,
+    TeacherID INTEGER REFERENCES Teacher(TeacherID) NOT NULL,
+    StudentID INTEGER REFERENCES Student(StudentID) NOT NULL,
+    PRIMARY KEY (LessonID, RoomID, Timeslot), -- Composite primary key
+    UNIQUE (RoomID, Timeslot) -- Ensures one room is assigned per timeslot
+);
+Use code with caution.
+content_copy
+Explanation:
+	1	Building Table:
+	◦	BuildingID: Unique identifier for each building (auto-incrementing).
+	◦	BuildingName: Name of the building.
+	2	Room Table:
+	◦	RoomID: Unique identifier for each room (auto-incrementing).
+	◦	BuildingID: Foreign key referencing the building where the room is located.
+	◦	RoomNumber: Room number within the building.
+	3	LessonSchedule Table:
+	◦	LessonID: Foreign key referencing the lesson.
+	◦	RoomID: Foreign key referencing the room where the lesson is held.
+	◦	Timeslot: The date and time the lesson is scheduled.
+	◦	TeacherID: Foreign key referencing the teacher.
+	◦	StudentID: Foreign key referencing the student.
+	◦	PRIMARY KEY (LessonID, RoomID, Timeslot): Composite primary key to ensure each lesson has a unique room and timeslot combination.
+	◦	UNIQUE (RoomID, Timeslot): Unique constraint to prevent double-booking a room for the same timeslot.
+Important Considerations:
+	•	Timeslot: The TIMESTAMP data type is chosen to store both date and time information accurately.
+	•	Composite Primary Key: The combination of LessonID, RoomID, and Timeslot ensures data integrity and enforces the business rule of one lesson per room per timeslot.
+	•	Unique Constraint: The UNIQUE (RoomID, Timeslot) constraint is the core mechanism to prevent a room from being assigned to multiple lessons at the same time.
+	•	Teacher and Student IDs: If you plan to have multiple students in a lesson, you'll need to create a separate table to establish a many-to-many relationship between lessons and students.
+	•	Extensibility: This schema is easily extensible. You can add more attributes (e.g., room capacity, teacher availability, etc.) to the respective tables as needed.
