@@ -1,0 +1,169 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue233;\red0\green0\blue0;
+\red179\green179\blue179;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c0\c0\c93333;\cssrgb\c0\c0\c0\c84706;
+\cssrgb\c75294\c75294\c75294;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{circle\}}{\leveltext\leveltemplateid102\'01\uc0\u9702 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs24 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Hypothesis:
+\f1\b0 \
+Postgres SSI will detect a potential write skew and abort one of the transactions (either Alice's or Bob's).\
+
+\f0\b SQL Code and Verification:
+\f1\b0 \
+Here's how you can test this in two Postgres sessions:\
+
+\f0\b Session 1 (Alice):
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 SQL\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;\
+SELECT txid_current();  -- Get transaction ID for Alice\
+\
+-- Assume table "duty" with columns (id, name)\
+\
+DELETE FROM duty WHERE name = 'Alice'; -- Alice gets off duty\
+\
+SELECT * FROM duty;\
+\
+COMMIT;\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 Use code {\field{\*\fldinst{HYPERLINK "/faq#coding"}}{\fldrslt \cf3 \ul \ulc3 \strokec3 with caution.}}\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 content_copy
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Session 2 (Bob):
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 SQL\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;\
+SELECT txid_current();  -- Get transaction ID for Bob\
+\
+DELETE FROM duty WHERE name = 'Bob';  -- Bob gets off duty\
+\
+SELECT * FROM duty;\
+\
+COMMIT;\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 Use code {\field{\*\fldinst{HYPERLINK "/faq#coding"}}{\fldrslt \cf3 \ul \ulc3 \strokec3 with caution.}}\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 content_copy
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Observations:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 One of the transactions will fail with a 
+\f2\fs26 serialization_failure
+\f1\fs24  error. This is Postgres SSI detecting the write skew.\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The other transaction will succeed, and its changes will be committed.\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 If you run 
+\f2\fs26 SELECT * FROM duty;
+\f1\fs24  in a new session, you'll see that only two people remain on duty (either Alice and Joe, or Bob and Joe, depending on which transaction was aborted).\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Showing xmin and xmax:
+\f1\b0 \
+After one transaction has committed, you can examine the system columns 
+\f2\fs26 xmin
+\f1\fs24  and 
+\f2\fs26 xmax
+\f1\fs24  to see the transaction IDs involved:\
+\pard\pardeftab720\partightenfactor0
+\cf0 SQL\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 SELECT xmin, xmax, * FROM duty;\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 Use code {\field{\*\fldinst{HYPERLINK "/faq#coding"}}{\fldrslt \cf3 \ul \ulc3 \strokec3 with caution.}}\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 content_copy
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Explanation of xmin and xmax:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0
+\f0\b \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 xmin:
+\f1\b0  The transaction ID that created the current row version.\
+\ls2\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 xmax:
+\f1\b0 \
+\pard\tx940\tx1440\pardeftab720\li1440\fi-1440\partightenfactor0
+\ls2\ilvl1\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 If the row version is still current (not deleted), 
+\f2\fs26 xmax
+\f1\fs24  is 0.\
+\ls2\ilvl1\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u9702 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 If the row version has been deleted or updated, 
+\f2\fs26 xmax
+\f1\fs24  is the transaction ID of the transaction that made the change.\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Example Output (Illustrative):
+\f1\b0 \
+Let's say Alice's transaction (with txid_current() returning 1234) was aborted, and Bob's transaction (with txid_current() returning 5678) succeeded. You might see something like this:\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0  xmin | xmax | id | name\
+------+------+----+------\
+ 1234 | 5678 | 1  | Alice  -- Deleted by Bob's transaction (5678)\
+ 5678 | 0    | 2  | Bob    -- Deleted by Bob's transaction (5678)\
+ 1234 | 0    | 3  | Joe\
+ 1234 | 0    | 4  | Susan \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs24 \cf0 Key Takeaways:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Postgres SSI effectively prevents write skew anomalies by aborting transactions that would lead to inconsistent states.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The 
+\f2\fs26 xmin
+\f1\fs24  and 
+\f2\fs26 xmax
+\f1\fs24  system columns provide valuable information about which transactions created and modified row versions.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 In practice, applications should be prepared to handle serialization failures and retry transactions gracefully.\
+\pard\pardeftab720\partightenfactor0
+\cf0 \
+\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 tuneshare
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\
+
+\f3\fs22 \cf4 \cb5 \strokec4 more_vert
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\
+}

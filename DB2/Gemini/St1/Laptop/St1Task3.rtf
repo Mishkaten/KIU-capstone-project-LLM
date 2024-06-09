@@ -1,0 +1,154 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue233;\red0\green0\blue0;
+\red179\green179\blue179;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c0\c0\c93333;\cssrgb\c0\c0\c0\c84706;
+\cssrgb\c75294\c75294\c75294;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid1\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}}{\leveltext\leveltemplateid101\'01\'00;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid201\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid3}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b\fs24 \cf0 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Understanding Denormalization in MongoDB
+\f1\b0 \
+MongoDB, as a NoSQL database, prioritizes flexibility and performance over strict normalization. Denormalization is common, meaning data that would be separated into multiple tables in a relational database is often nested within a single document in MongoDB.\
+
+\f0\b Example Teacher Document
+\f1\b0 \
+Let's assume we have a teacher document in a MongoDB collection:\
+\pard\pardeftab720\partightenfactor0
+\cf0 JSON\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 \{\
+    "_id": ObjectId("6486631fa078f41286b398c6"),\
+    "name": "John Doe",\
+    "subjects": ["Math", "Physics"],\
+    "classes": [\
+        \{\
+            "name": "Algebra 101",\
+            "students": ["Alice", "Bob", "Charlie"]\
+        \},\
+        \{\
+            "name": "Physics Fundamentals",\
+            "students": ["David", "Emma", "Frank"]\
+        \}\
+    ]\
+\}\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 Use code {\field{\*\fldinst{HYPERLINK "/faq#coding"}}{\fldrslt \cf3 \ul \ulc3 \strokec3 with caution.}}\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 content_copy
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Normalization Concepts Violated
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\f0\b \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Atomicity (1NF):
+\f1\b0  The 
+\f2\fs26 subjects
+\f1\fs24  array violates 1NF. Ideally, each subject should be a separate record in a "subjects" table.\
+\ls1\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Second Normal Form (2NF):
+\f1\b0  The nested 
+\f2\fs26 classes
+\f1\fs24  array, especially the 
+\f2\fs26 students
+\f1\fs24  within it, violates 2NF. Student data should be in a separate "students" table, with a foreign key relationship to the "classes" table.\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Retrieving Insertion Time
+\f1\b0 \
+MongoDB automatically adds a 
+\f2\fs26 _id
+\f1\fs24  field to each document upon insertion. This 
+\f2\fs26 _id
+\f1\fs24  is an ObjectId object that contains a timestamp component. We can extract the timestamp to get the insertion time.\
+
+\f0\b Solution (JavaScript Example with MongoDB Node.js Driver)
+\f1\b0 \
+\pard\pardeftab720\partightenfactor0
+\cf0 JavaScript\
+\pard\pardeftab720\partightenfactor0
+
+\f2\fs26 \cf0 const \{ MongoClient, ObjectId \} = require('mongodb');\
+\
+async function main() \{\
+    const client = new MongoClient('mongodb://localhost:27017');\
+    await client.connect();\
+    const db = client.db('school'); // Assuming 'school' is your database\
+\
+    const teacherCollection = db.collection('teachers');\
+\
+    const teacher = await teacherCollection.findOne();\
+    if (teacher) \{\
+        const insertionTime = new Date(teacher._id.getTimestamp());\
+\
+        console.log("Teacher Document:");\
+        console.log(teacher);\
+\
+        console.log("\\nInsertion Time:");\
+        console.log(insertionTime);\
+    \}\
+\
+    await client.close();\
+\}\
+\
+main();\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 Use code {\field{\*\fldinst{HYPERLINK "/faq#coding"}}{\fldrslt \cf3 \ul \ulc3 \strokec3 with caution.}}\
+\pard\pardeftab720\partightenfactor0
+
+\f3\fs22 \cf4 \cb5 \strokec4 content_copy
+\f1\fs24 \cf0 \cb1 \strokec2 \
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Explanation:
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls2\ilvl0
+\f0\b \cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	1	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Connect:
+\f1\b0  Connect to your MongoDB database.\
+\ls2\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	2	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Query:
+\f1\b0  Fetch a single teacher document using 
+\f2\fs26 findOne()
+\f1\fs24 .\
+\ls2\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	3	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Get Timestamp:
+\f1\b0  Extract the timestamp from the 
+\f2\fs26 _id
+\f1\fs24 's ObjectId.\
+\ls2\ilvl0
+\f0\b \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	4	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Display:
+\f1\b0  Print the teacher document and its insertion time.\
+\pard\pardeftab720\sa240\partightenfactor0
+
+\f0\b \cf0 Key Points
+\f1\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls3\ilvl0\cf0 \kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 MongoDB's flexibility allows for denormalization, which can improve read performance.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 Denormalization can introduce data redundancy and potential update anomalies.\
+\ls3\ilvl0\kerning1\expnd0\expndtw0 \outl0\strokewidth0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 The 
+\f2\fs26 _id
+\f1\fs24  field provides a convenient way to track document insertion time.\
+}
