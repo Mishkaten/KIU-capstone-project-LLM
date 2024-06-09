@@ -1,0 +1,63 @@
+Enhanced Teacher Document (Normalized):
+JSON
+{
+    "_id": ObjectId("64869b3159669d1694387c85"),
+    "name": "John Doe",
+    "age": 35,
+    "courseIds": [
+        ObjectId("64869b3059669d1694387c83"),
+        ObjectId("64869b3059669d1694387c84")
+    ],
+    "addressId": ObjectId("64869b3059669d1694387c82")
+}
+Use code with caution.
+
+content_copy
+
+
+Explanation of Changes:
+	•	1NF (First Normal Form): The courses array has been replaced with courseIds, which stores only the ObjectIds of the courses. This ensures that each attribute in the Teacher document contains only atomic values.
+	•	2NF (Second Normal Form) & 3NF (Third Normal Form): To resolve these violations, we've created separate collections for Courses and Addresses. The courseIds and addressId fields in the Teacher document now reference the corresponding documents in these collections. This ensures that data dependencies are properly handled, and there's no redundant information.
+Additional Collections:
+JSON
+// Courses Collection
+{
+    "_id": ObjectId("64869b3059669d1694387c83"),
+    "name": "Mathematics",
+    "department": "Science"
+}
+{
+    "_id": ObjectId("64869b3059669d1694387c84"),
+    "name": "Physics",
+    "department": "Science"
+}
+
+// Addresses Collection
+{
+    "_id": ObjectId("64869b3059669d1694387c82"),
+    "street": "123 Main St",
+    "city": "Anytown",
+    "zipcode": "12345"
+}
+Use code with caution.
+
+content_copy
+
+
+Retrieving Insertion Time:
+	1	Get ObjectId: Let's say the ObjectId of the teacher document is 64869b3159669d1694387c85.
+	2	Extract Timestamp: In MongoDB Shell, you would run: JavaScript ObjectId("64869b3159669d1694387c85").getTimestamp()
+	3	   Use code with caution.  content_copy    This would return the insertion time of the document.
+Solution File:
+# Teacher Document:
+
+{ ... (the normalized JSON document shown above) }
+
+# Insertion Time:
+
+2023-06-10T12:31:29.000Z
+Key Advantages:
+	•	Reduced Redundancy: Normalized data eliminates data duplication, saving storage space and reducing the risk of inconsistencies.
+	•	Improved Data Integrity: Enforcing relationships through foreign keys helps maintain data integrity.
+	•	Easier Maintenance: Updating a single piece of information (e.g., a course name) only requires modifying one document in the Courses collection, rather than multiple teacher documents.
+	•	Scalability: Normalized structures are generally more adaptable to future changes and growth.
