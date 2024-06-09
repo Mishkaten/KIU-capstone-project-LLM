@@ -1,0 +1,19 @@
+3.1 Maximum New Edges for S-Lock Request
+	•	Explanation: In a waits-for-graph under strict 2PL, an edge from transaction T1 to T2 means T1 is waiting for T2 to release a lock. When a new transaction requests an S-lock, it can only be blocked by transactions holding an X-lock on the same object.
+	•	Final Answer: The maximum number of new edges is n, since in the worst case, all n transactions in the existing graph could be holding an X-lock on the object that the new transaction is requesting an S-lock on.
+3.2 Maximum New Edges for X-Lock Request
+	•	Explanation: When a new transaction requests an X-lock, it can be blocked by transactions holding either an S-lock or an X-lock on the same object.
+	•	Final Answer: The maximum number of new edges is n, same as in the previous case. Even though more transactions (holding S-locks) can now block the new transaction, each of those blocking transactions can only create one incoming edge to the new transaction in the waits-for graph. pen_spark    
+
+
+
+
+
+
+
+
+
+
+
+
+
