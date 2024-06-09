@@ -1,0 +1,11 @@
+In this scenario with PostgreSQL's Serializable Snapshot Isolation (SSI), we can expect the following behavior and hypothesis:
+How PostgreSQL SSI Behaves:
+	1	Snapshot Isolation:  Both Alice and Bob begin their transactions by reading a snapshot of the duty list. This snapshot reflects the state of the database at the beginning of their respective transactions.
+	2	Write Intent:  When Alice and Bob attempt to update the duty list (remove themselves), PostgreSQL tracks their write intent on the relevant rows.
+	3	Conflict Detection: SSI detects a potential write skew because both Alice and Bob intend to modify the same data (the duty list) in a way that could violate the constraint of having at least two people on duty.
+	4	Serialization Error:  To maintain serializability, PostgreSQL will abort one of the transactions (either Alice's or Bob's), raising a serialization error. The aborted transaction will have to be retried.
+Hypothesis:
+The specific transaction to be aborted is not deterministic. PostgreSQL will likely choose one at random or based on some internal heuristics.  The goal is to ensure that only one of the conflicting transactions succeeds, guaranteeing that at least two people remain on the duty list.
+Additional Considerations:
+	•	Predictable Locks: While SSI primarily relies on snapshot isolation and optimistic concurrency control, it may also use predictable locks in certain situations to prevent write skews. These locks would be acquired on the duty list to ensure exclusive access during the update process.
+	•	Transaction Fallback: The aborted transaction (either Alice's or Bob's) can be automatically retried by the application. Upon retry, it will read a fresh snapshot of the database, which may have already been modified by the successful transaction. This ensures that the retrying transaction sees the updated state and makes a decision based on the most current information.
