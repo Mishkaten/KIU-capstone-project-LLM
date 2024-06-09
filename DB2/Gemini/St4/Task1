@@ -1,0 +1,29 @@
+1. Autocommit On:
+	•	Rows after commands:
+	◦	(1, 'Miller')
+	◦	(2, 'Neuer')
+	◦	(3, 'Doe')
+	•	Explanation:
+	◦	Each statement is its own transaction.
+	◦	The first two INSERT statements succeed and are committed immediately.
+	◦	The BEGIN is essentially ignored as each statement is already a transaction.
+	◦	The third INSERT succeeds and is committed.
+	◦	The fourth INSERT fails due to the duplicate primary key (ID=4) and is rolled back. This does not affect previous transactions.
+	◦	The fifth INSERT fails for the same reason and is rolled back.
+	◦	The COMMIT has no effect as there's no active transaction.
+2. Autocommit Off (Bonus):
+	•	Rows after commands:
+	◦	(1, 'Miller')
+	◦	(2, 'Neuer')
+	◦	(3, 'Doe')
+	•	Explanation:
+	◦	Autocommit off means we are in one transaction until a COMMIT or ROLLBACK.
+	◦	The first three INSERT statements succeed.
+	◦	The fourth INSERT fails due to the duplicate primary key and is not committed yet.
+	◦	The fifth INSERT also fails due to the duplicate primary key and is not committed yet.
+	◦	The COMMIT attempts to commit the entire transaction but fails because of the duplicate key errors.
+	◦	The entire transaction is rolled back, leaving only the first three inserts.
+Key Points:
+	•	Autocommit ON: Each statement is a transaction, so errors in one statement don't affect others.
+	•	Autocommit OFF: All statements are part of the same transaction until COMMIT. Errors anywhere cause the whole transaction to be rolled back.
+	•	Empty table: Starting with an empty table doesn't change the behavior; the success or failure of each statement is still determined by the autocommit setting and whether the statement itself is valid.
