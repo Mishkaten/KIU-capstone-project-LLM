@@ -1,0 +1,15 @@
+	1	Snapshot Isolation and Write Intent:  Both Alice and Bob begin their transactions with a consistent snapshot of the duty list. PostgreSQL tracks their intent to modify this list.
+	2	Potential Conflict Detection: SSI recognizes that both Alice and Bob are trying to update the same data (the duty list), which could lead to a write skew and violate the constraint of having at least two people on duty.
+	3	Conflict Resolution (Locks and Serialization Errors):
+	◦	Lock-Based Approach (if used): PostgreSQL might use predictable locks on the relevant rows of the duty list. Either Alice or Bob would acquire an exclusive lock first, preventing the other transaction from proceeding until the lock is released.
+	◦	Serialization Error (SSI primary mechanism): Even without explicit locks, SSI would detect the potential conflict. To maintain serializability, it aborts one of the transactions, raising a serialization error. The aborted transaction must be retried.
+	4	Transaction Retry: The aborted transaction (let's say Alice's) is retried.  It reads a new snapshot of the duty list, which may now reflect Bob's update (if Bob's transaction committed successfully). Alice's retry will take this updated state into account, ensuring consistency.
+Outcome Analysis:
+This scenario results in a true positive outcome. PostgreSQL correctly identifies a conflict (write skew) that could violate the database constraint. By aborting one of the transactions and allowing the other to proceed (and potentially retrying the aborted transaction), it ensures that the final state of the database remains consistent with the constraint.
+Why Not Other Outcomes:
+	•	False Positive: Unlikely, as a real conflict exists.
+	•	True Negative: Impossible, as the concurrent updates would violate the constraint.
+Key Points:
+	•	SSI Effectiveness: SSI's combination of snapshot isolation and conflict detection mechanisms effectively handles concurrent transactions and prevents inconsistencies.
+	•	Predictable Locks (Optional): PostgreSQL may use predictable locks in addition to SSI to further guarantee serializability.
+	•	Transaction Retries: Retrying aborted transactions ensures that they see the most up-to-date data and can make decisions accordingly.
