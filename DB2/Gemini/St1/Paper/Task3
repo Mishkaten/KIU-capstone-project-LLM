@@ -1,0 +1,17 @@
+Understanding Waits-For Graphs
+A waits-for graph in a database system represents the blocking relationships between transactions.
+	•	Nodes: Each node represents a transaction.
+	•	Edges: An edge from transaction T1 to T2 means T1 is waiting for T2 to release a lock.
+3.1: New Transaction Requests S-Lock
+	•	Maximum New Edges: In the worst-case scenario, the new transaction (n+1) requesting a shared (S) lock could be blocked by all existing 'n' transactions. This is because any of the existing transactions could hold an exclusive (X) lock on the same object.
+	•	Reasoning:
+	◦	S-locks are compatible with other S-locks but not with X-locks.
+	◦	If any of the 'n' transactions holds an X-lock on the object, the new transaction (n+1) will have to wait, leading to a new edge in the graph for each such transaction.
+3.2: New Transaction Requests X-Lock
+	•	Maximum New Edges: The new transaction requesting an exclusive (X) lock could be blocked by all existing 'n' transactions.
+	•	Reasoning:
+	◦	X-locks are not compatible with either S-locks or other X-locks.
+	◦	If any of the 'n' transactions holds either an S-lock or an X-lock on the object, the new transaction will have to wait, creating a new edge for each.
+Key Points
+	•	The maximum number of new edges in a waits-for graph depends on the type of lock requested (S or X) and the locks held by existing transactions.
+	•	In strict 2PL, a transaction cannot release a lock until it has acquired all the locks it needs. This can lead to deadlocks, which are cycles in the waits-for graph.
