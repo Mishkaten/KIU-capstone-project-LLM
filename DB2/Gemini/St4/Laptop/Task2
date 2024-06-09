@@ -1,0 +1,57 @@
+	•	Building:
+	◦	BuildingID (Primary Key, SERIAL for auto-increment)
+	◦	Name (VARCHAR, cannot be NULL)
+	•	Room: (Weak Entity)
+	◦	RoomID (Primary Key, SERIAL for auto-increment)
+	◦	BuildingID (Foreign Key referencing Building.BuildingID, ON DELETE CASCADE)
+	◦	Name (VARCHAR, cannot be NULL)
+	•	Lesson:
+	◦	LessonID (Primary Key, SERIAL for auto-increment)
+	◦	TeacherID (Foreign Key referencing Teacher.TeacherID, ON DELETE RESTRICT)
+	◦	StudentID (Foreign Key referencing Student.StudentID, ON DELETE RESTRICT)
+	◦	Timeslot (TIMESTAMP, cannot be NULL)
+	•	LessonSchedule: (Associative Entity)
+	◦	LessonID (Foreign Key referencing Lesson.LessonID, ON DELETE CASCADE)
+	◦	RoomID (Foreign Key referencing Room.RoomID, ON DELETE CASCADE)
+	◦	Timeslot (TIMESTAMP, cannot be NULL)
+	◦	Unique constraint on (RoomID, Timeslot)
+SQL Script
+SQL
+-- Building Table
+CREATE TABLE Building (
+    BuildingID SERIAL PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+);
+
+-- Room Table (Weak Entity)
+CREATE TABLE Room (
+    RoomID SERIAL PRIMARY KEY,
+    BuildingID INT REFERENCES Building(BuildingID) ON DELETE CASCADE,
+    Name VARCHAR(20) NOT NULL
+);
+
+-- Lesson Table
+CREATE TABLE Lesson (
+    LessonID SERIAL PRIMARY KEY,
+    TeacherID INT REFERENCES Teacher(TeacherID) ON DELETE RESTRICT,
+    StudentID INT REFERENCES Student(StudentID) ON DELETE RESTRICT,
+    Timeslot TIMESTAMP NOT NULL
+);
+
+-- LessonSchedule Table (Associative Entity, Composite FK, Unique Constraint)
+CREATE TABLE LessonSchedule (
+    LessonID INT REFERENCES Lesson(LessonID) ON DELETE CASCADE,
+    RoomID INT REFERENCES Room(RoomID) ON DELETE CASCADE,
+    Timeslot TIMESTAMP NOT NULL,
+    UNIQUE (RoomID, Timeslot)
+);
+Use code with caution.
+
+content_copy
+
+
+Explanation
+	•	Weak Entity: The Room table is a weak entity because its existence depends on the Building table. The ON DELETE CASCADE ensures that if a building is deleted, all its associated rooms are also deleted.
+	•	Foreign Keys (FK) and Primary Keys (PK): Primary keys uniquely identify each record in a table. Foreign keys create relationships between tables, ensuring data consistency.
+	•	Composite Foreign Key: The combination of LessonID and RoomID in the LessonSchedule table forms a composite foreign key, referencing the primary keys of the Lesson and Room tables.
+	•	Unique Constraint: The unique constraint on (RoomID, Timeslot) in the LessonSchedule table prevents the same room from being booked for multiple lessons at the same time.
