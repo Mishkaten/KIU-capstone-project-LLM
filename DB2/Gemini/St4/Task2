@@ -1,0 +1,193 @@
+2.1
+Initial schedule:
+T1     | T2     | T3
+-------|-------|-------
+       |Read a  |
+       |Write a |
+Read b |       |
+       |Read c |
+       |       |Read b
+       |       |Read c
+       |Write c|
+       |       |Write b
+	1	Swap Read a (T2) and Read b (T1): This is allowed as they are non-conflicting operations. The schedule becomes:
+T1     | T2     | T3
+-------|-------|-------
+Read b |Read a  |       
+       |Write a |       
+       |       |Read b
+       |Read c |Read c
+       |       |Write b
+       |Write c|       
+	2	Swap Write a (T2) and Read b (T3): This is allowed as they are non-conflicting operations. The schedule becomes:
+T1     | T2     | T3
+-------|-------|-------
+Read b |Read a  |       
+       |       |Read b
+       |Write a |Read c
+       |       |Write b
+       |Read c |       
+       |Write c|       
+	3	Swap Write a (T2) and Read c (T3): This is allowed as they are non-conflicting operations. The schedule becomes:
+T1     | T2     | T3
+-------|-------|-------
+Read b |Read a  |       
+       |       |Read b
+       |       |Read c
+       |Write a |Write b
+       |Read c |       
+       |Write c|       
+	4	Swap Read c (T2) and Write a (T2): This is not allowed as they are conflicting operations (both from T2 and operate on different data items).
+The resulting schedule:
+T1     | T3     | T2
+-------|-------|-------
+Read b |Read b  |Read a  
+       |Read c  |       
+       |Write b |Write a
+       |       |Read c 
+       |       |Write c
+2.2
+Schedule:
+T1     | T2     | T3
+-------|-------|-------
+       |Read a  |
+       |Write a |
+Read b |       |
+       |Read c |
+       |       |Read b
+       |       |Read c
+       |Write c|
+       |       |Write b
+Strict 2PL Solution with Detailed Locks:
+Transaction
+T1
+T2
+T3
+Actions and Locks
+
+
+Read a (S)
+
+T2 acquires shared lock on 'a'
+
+
+Write a (X)
+
+T2 upgrades lock on 'a' to exclusive (write)
+
+Read b (S)
+
+
+T1 acquires shared lock on 'b'
+
+
+Read c (S)
+Read b (S)
+T2 acquires shared lock on 'c', T3 acquires shared lock on 'b'
+
+
+
+Read c (S)
+T3 acquires shared lock on 'c'
+
+
+Write c (X)
+
+T2 upgrades lock on 'c' to exclusive (write)
+
+
+Commit
+
+T2 commits changes and releases all locks (a, c)
+
+
+Unlock a, c
+
+Locks on 'a' and 'c' are released
+
+Write b (X)
+
+
+T1 acquires exclusive lock on 'b' (write)
+
+Commit
+
+Write b (X)
+T1 commits and T3 acquires exclusive lock on 'b' (write)
+
+Unlock b
+
+Commit
+T1 releases lock on 'b', T3 commits changes
+
+
+
+Unlock b, c
+T3 releases all locks (b, c)
+drive_spreadsheetExport to Sheets
+Explanation:
+	1	T2: Begins by reading 'a' (S) and then upgrading to an exclusive lock (X) to write to 'a'. It then reads 'c' (S) and upgrades to an exclusive lock (X) to write to 'c'. After committing, it releases the locks on 'a' and 'c'.
+	2	T1: Reads 'b' (S) and then waits for T2 to release the lock on 'c' before acquiring an exclusive lock (X) to write to 'b'. After committing, it releases the lock on 'b'.
+	3	T3: Reads 'b' and 'c' (S) and then waits for T1 and T2 to release their locks before acquiring an exclusive lock (X) on 'b' to write. After committing, it releases the locks on 'b' and 'c'.
+Key Points:
+	•	Lock Upgrades: T2 and T1 demonstrate lock upgrades (from shared to exclusive) when they need to modify data they initially read.
+	•	Waits: T1 and T3 wait for other transactions to release locks before they can proceed with their writes, ensuring data integrity.
+	•	Unlocks and Releases: Locks are explicitly released after commits or when no longer needed.
+2.3
+Transaction
+T1
+T2
+T3
+MVCC Repeatable Read
+Commit Timestamp
+
+
+Read a (v1)
+
+T2 reads the initial version of 'a' (v1)
+
+
+
+Write a (v2)
+
+T2 creates a new version of 'a' (v2) and commits immediately
+Immediately after Write a (v2)
+
+Read b (v1)
+
+
+T1 reads the initial version of 'b' (v1)
+
+
+
+Read c (v1)
+Read b (v1)
+T2 reads the initial version of 'c' (v1), T3 reads the initial version of 'b' (v1)
+
+
+
+Write c (v2)
+Read c (v1)
+T2 creates a new version of 'c' (v2) and commits immediately. T3 reads the initial version of 'c' (v1) because it started before T2's commit, ensuring repeatable reads.
+Immediately after Write c (v2)
+
+Write c (v3)
+
+Write b (v2)
+T1 creates a new version of 'c' (v3) and commits immediately. T3 creates a new version of 'b' (v2) and commits immediately
+Immediately after Write c (v3)
+
+drive_spreadsheet
+Export to Sheets
+
+
+
+Key Points:
+	•	Commit Timestamp: Each transaction's commit is associated with a timestamp, reflecting when the transaction's changes become visible to other transactions.
+	•	MVCC: Transactions read the most recent committed version available at their start time, ensuring repeatable reads.
+	•	Immediate Commit: In this example, transactions commit as soon as their writes are complete.
+Explanation:
+	1	T2: Commits immediately after writing a (v2) and again after writing c (v2).
+	2	T1: Commits immediately after writing c (v3).
+	3	T3: Commits immediately after writing b (v2).
+
