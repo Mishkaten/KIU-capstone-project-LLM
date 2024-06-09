@@ -1,0 +1,10 @@
+Postgres SSI will detect a potential write skew and abort one of the transactions (either Alice's or Bob's).
+Explanation:
+Here's how Postgres SSI would likely handle this scenario:
+	1	Snapshot Isolation: Both Alice and Bob begin their transactions and read the current state of the duty list (4 people on duty).
+	2	Write Intent: Both Alice and Bob intend to remove themselves from the duty list, which would result in only two people remaining on duty (Joe and Susan).
+	3	Conflict Detection: When either Alice or Bob tries to commit their transaction, Postgres SSI detects a potential write skew. This is because the transactions are based on the same initial snapshot, and both are trying to modify the data in a way that violates the constraint (minimum of 2 people on duty).
+	4	Serialization Error: Postgres SSI will raise a serialization error to abort one of the transactions. The choice of which transaction to abort can be arbitrary or based on some internal heuristics.
+	5	Retry: The aborted transaction can be retried. In the retry, it will read the latest state of the duty list (which might have been modified by the other transaction).
+Why this is important:
+Write skew anomalies can occur when two transactions read the same data, then update different parts of it based on that initial read. This can lead to inconsistencies and violate application constraints. SSI helps prevent these anomalies by detecting conflicts between concurrent transactions and ensuring that the resulting database state is equivalent to some serial execution of the transactions.
