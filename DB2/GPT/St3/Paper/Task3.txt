@@ -1,0 +1,52 @@
+3.1
+When another concurrent transaction (
+n
++
+1
+n+1) starts and requests an S-lock (shared lock) on an object, it will wait if and only if another transaction currently holds an X-lock (exclusive lock) on that object. Under strict 2PL:
+
+Only one transaction can hold an X-lock on an object at any time.
+S-locks are compatible with other S-locks, meaning multiple transactions can hold S-locks on the same object concurrently.
+If a transaction (
+n
++
+1
+n+1) requests an S-lock and gets involved in the waits-for-graph, this implies that another transaction is holding an X-lock on the object.
+Therefore, the new transaction (
+n
++
+1
+n+1) will wait for exactly one transaction that holds the X-lock, leading to one new edge being added to the waits-for-graph.
+
+Solution for 3.1
+The maximum number of new edges that will be added to the waits-for-graph when a new transaction (
+n
++
+1
+n+1) requests an S-lock is 1.
+
+Explanation for 3.2
+When another concurrent transaction starts and requests an X-lock (exclusive lock) on an object, it will wait for all transactions holding either S-locks or X-locks on that object. Under strict 2PL:
+
+An X-lock conflicts with both S-locks and X-locks.
+If there are 
+n
+n active transactions, and any of them hold an S-lock or X-lock on the object, the new transaction requesting the X-lock will wait for all those transactions.
+Therefore, the new transaction (
+n
++
+1
+n+1) will potentially wait for all 
+n
+n transactions, leading to 
+n
+n new edges being added to the waits-for-graph.
+
+Solution for 3.2
+The maximum number of new edges that will be added to the waits-for-graph when a new transaction requests an X-lock is n.
+
+Summary
+3.1: The explanation provided aligns with the correct understanding. The new transaction waiting for exactly one transaction holding an X-lock results in 1 new edge being added to the graph.
+3.2: The new transaction waiting for all 
+n
+n transactions holding either S-locks or X-locks results in n new edges being added to the graph.

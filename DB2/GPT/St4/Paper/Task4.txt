@@ -1,0 +1,54 @@
+In PostgreSQL's Serializable Snapshot Isolation (SSI), a "predicate lock" is a mechanism used to ensure that transactions behave as if they were executed serially. Predicate locks are placed on all rows that match the conditions of a query, even if those rows do not exist yet. This helps prevent anomalies such as write skew by detecting conflicts between concurrent transactions.
+
+Given Scenario
+There are 4 persons on duty: Alice, Bob, Joe, and Susan.
+A minimum of 2 persons need to remain on duty.
+Alice and Bob start concurrent transactions to remove themselves from the duty list.
+Transaction Details
+T1 (Alice): Removes herself from the duty list.
+
+sql
+Copy code
+BEGIN;
+-- Read the number of persons on duty
+SELECT COUNT(*) FROM test_ssi WHERE on_duty = true;
+-- Remove Alice from the duty list
+UPDATE test_ssi SET on_duty = false WHERE name = 'Alice';
+COMMIT;
+T2 (Bob): Removes himself from the duty list.
+
+sql
+Copy code
+BEGIN;
+-- Read the number of persons on duty
+SELECT COUNT(*) FROM test_ssi WHERE on_duty = true;
+-- Remove Bob from the duty list
+UPDATE test_ssi SET on_duty = false WHERE name = 'Bob';
+COMMIT;
+Hypothesis and PostgreSQL SSI Behavior
+Initial Reads and Predicate Locks:
+
+T1 and T2 both execute SELECT COUNT(*) FROM test_ssi WHERE on_duty = true;
+Predicate locks are placed on all rows where on_duty = true.
+Intended Updates:
+
+T1 intends to update the row for Alice (UPDATE test_ssi SET on_duty = false WHERE name = 'Alice';)
+T2 intends to update the row for Bob (UPDATE test_ssi SET on_duty = false WHERE name = 'Bob';)
+Conflict Detection:
+
+Both transactions read the same set of rows (all persons currently on duty).
+Predicate locks ensure that any modification to the rows that were read will be detected.
+When T1 attempts to commit, it will check if there have been any conflicting changes to the predicate-locked rows.
+Similarly, when T2 attempts to commit, it will perform the same check.
+Aborting a Transaction:
+
+If T1 commits first, T2 will detect the conflict (since T1 modified a row that T2 read).
+T2 will be aborted to prevent the write skew.
+If T2 commits first, T1 will be aborted for the same reason.
+Expected Outcome
+T1 and T2 cannot both commit successfully because they would violate the constraint of having at least 2 persons on duty.
+PostgreSQL SSI will ensure serializability by aborting one of the transactions.
+Conclusion
+PostgreSQL SSI will prevent both Alice and Bob from removing themselves from the duty list simultaneously by using predicate locks. The system will detect the write skew conflict when either T1 or T2 tries to commit. One of the transactions will be aborted to maintain the consistency and integrity of the data, ensuring that at least 2 persons remain on duty.
+
+This mechanism ensures that the transactions behave as if they were executed serially, thus preventing write skew and other anomalies.

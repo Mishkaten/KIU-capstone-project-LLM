@@ -1,0 +1,273 @@
+2.1
+
+Given Schedule with Commits:
+Transaction T1	Transaction T2	Transaction T3
+Read a	
+Write a	
+Read b		
+Read c	
+Read b
+Read c
+Write c	
+Write b
+Commit	
+Commit		
+Commit
+Step-by-Step Swapping:
+Initial Schedule:
+
+T2: Read a, Write a
+T1: Read b
+T2: Read c
+T3: Read b, Read c
+T2: Write c, Commit
+T3: Write b, Commit
+T1: Commit
+Step 1: Move Read b of T1 up
+
+We cannot move Read b of T1 before Read a and Write a of T2 because they do not conflict.
+Current schedule remains:
+T2: Read a, Write a
+T1: Read b
+T2: Read c
+T3: Read b, Read c
+T2: Write c, Commit
+T3: Write b, Commit
+T1: Commit
+Step 2: Move Read c of T2 up
+
+T2: Read a, Write a, Read c
+T1: Read b
+T3: Read b, Read c
+T2: Write c, Commit
+T3: Write b, Commit
+T1: Commit
+Step 3: Move Read b of T3 up
+
+T2: Read a, Write a, Read c
+T1: Read b
+T3: Read b
+T3: Read c
+T2: Write c, Commit
+T3: Write b, Commit
+T1: Commit
+Step 4: Move Read c of T3 up
+
+T2: Read a, Write a, Read c
+T1: Read b
+T3: Read b, Read c
+T2: Write c, Commit
+T3: Write b, Commit
+T1: Commit
+Step 5: Move Write c of T2 up
+
+T2: Read a, Write a, Read c, Write c, Commit
+T1: Read b
+T3: Read b, Read c, Write b, Commit
+T1: Commit
+Step 6: Move Write b of T3 up
+
+T2: Read a, Write a, Read c, Write c, Commit
+T1: Read b, Commit
+T3: Read b, Read c, Write b, Commit
+Final Schedule:
+T2: Read a, Write a, Read c, Write c, Commit
+T1: Read b, Commit
+T3: Read b, Read c, Write b, Commit
+Final Detailed Sequence:
+T2: Read a
+T2: Write a
+T2: Read c
+T2: Write c
+T2: Commit
+T1: Read b
+T1: Commit
+T3: Read b
+T3: Read c
+T3: Write b
+T3: Commit
+Conclusion:
+The final schedule, including commits, is now a serial schedule, as it is equivalent to the serial execution of T2 followed by T1 and T3. This means the given schedule is serializable.
+
+2.2
+
+Transactions hold all locks until they commit or rollback.
+Once a lock is released, it cannot be re-acquired by the same transaction.
+Let's go through the schedule and apply strict 2PL, detailing when locks are acquired, held, and released.
+
+Given Schedule:
+Transaction T1	Transaction T2	Transaction T3
+Read a	
+Write a	
+Read b		
+Read c	
+Read b
+Read c
+Write c	
+Write b
+Execution under Strict 2PL:
+Transaction T1	Transaction T2	Transaction T3	Strict 2PL (Locking)
+Read a		T2 acquires S-lock on a, reads a
+Write a		T2 upgrades to X-lock on a, writes a
+Read b			T1 acquires S-lock on b, reads b
+Read c		T2 acquires S-lock on c, reads c
+Read b	T3 waits for S-lock on b (held by T1)
+Read c	T3 acquires S-lock on c, reads c
+Write c		T2 upgrades to X-lock on c, writes c
+Write b	T3 waits for X-lock on b (held by T1)
+Commit			T1 releases S-lock on b, commits
+Commit		T3 acquires X-lock on b, writes b
+T3 releases S-lock on c, X-lock on b, commits
+Commit	T2 releases S-lock on a, X-lock on a, S-lock on c, X-lock on c, commits
+Detailed Sequence:
+T2 starts:
+
+Read a: T2 acquires an S-lock on a.
+Write a: T2 upgrades to an X-lock on a (lock is held until commit).
+T1 starts:
+
+Read b: T1 acquires an S-lock on b (lock is held until commit).
+T2 continues:
+
+Read c: T2 acquires an S-lock on c.
+T3 starts:
+
+Read b: T3 waits because T1 holds an S-lock on b.
+Read c: T3 acquires an S-lock on c.
+T2 continues:
+
+Write c: T2 upgrades to an X-lock on c (lock is held until commit).
+T3 continues:
+
+Write b: T3 waits because T1 holds an S-lock on b.
+T1 completes:
+
+Commit: T1 releases the S-lock on b.
+T3 continues:
+
+Write b: T3 acquires an X-lock on b (lock is held until commit).
+Commit: T3 releases the S-lock on c and the X-lock on b.
+T2 completes:
+
+Commit: T2 releases the S-lock on a, the X-lock on a, the S-lock on c, and the X-lock on c.
+Summary:
+T2 acquires and holds:
+S-lock on a, upgraded to X-lock on a
+S-lock on c, upgraded to X-lock on c
+T1 acquires and holds:
+S-lock on b
+T3 acquires and holds:
+S-lock on c
+X-lock on b
+Transactions commit or rollback as soon as possible, holding all necessary locks until they complete to ensure strict 2PL is maintained.
+
+
+2.3
+
+Multi-Version Concurrency Control (MVCC) allows transactions to see a consistent snapshot of the database at the time the transaction started. Under the Repeatable Read isolation level, transactions can see the state of the database as it was at the start of the transaction and no other transaction's modifications until they commit.
+
+Let's analyze the given schedule under MVCC Repeatable Read.
+
+Transaction T1    | Transaction T2    | Transaction T3
+-----------------------------------------------------
+                   | Read a            |
+                   | Write a           |
+Read b             |                   |
+                   | Read c            |
+                   |                   | Read b
+                   |                   | Read c
+                   |                   | Write b
+                   | Write c           |
+
+
+Execution Order Under MVCC Repeatable Read:
+Step-by-Step Execution:
+
+T2: Read a
+
+T2 reads the initial value of a.
+T2: Write a
+
+T2 writes a new value to a. This value is not visible to other transactions until T2 commits.
+T1: Read b
+
+T1 reads the initial value of b.
+T2: Read c
+
+T2 reads the initial value of c.
+T3: Read b
+
+T3 reads the initial value of b (not affected by T1's read).
+T3: Read c
+
+T3 reads the initial value of c.
+T3: Write b
+
+T3 writes a new value to b. This value is not visible to other transactions until T3 commits.
+T2: Write c
+
+T2 writes a new value to c. This value is not visible to other transactions until T2 commits.
+
+
+
+
+Commit/Rollback:
+Transaction Commit Order:
+
+T2 commits:
+
+Changes to a and c are now visible to other transactions.
+T1 commits:
+
+No changes made by T1, so no new visibility issues.
+T3 commits:
+
+Changes to b are now visible to other transactions.
+
+
+
+
+Final State:
+T2: Read a, Write a, Read c, Write c
+
+a and c are updated by T2.
+T1: Read b
+
+b is read by T1 before T3's write to b.
+T3: Read b, Read c, Write b
+
+b and c are read by T3, and b is written by T3.
+
+
+
+Transaction T1    | Transaction T2    | Transaction T3    | MVCC Repeatable Read
+--------------------------------------------------------------------------------
+                   | Read a            |                   | T2: Read a
+                   | Write a           |                   | T2: Write a
+Read b             |                   |                   | T1: Read b
+                   | Read c            |                   | T2: Read c
+                   |                   | Read b            | T3: Read b
+                   |                   | Read c            | T3: Read c
+                   |                   | Write b           | T3: Write b
+                   | Write c           |                   | T2: Write c
+                   |                   |                   | T2: Commit
+                   |                   |                   | T1: Commit
+                   |                   |                   | T3: Commit
+
+
+
+Explanation:
+
+T2 reads a and writes to a. T2 also reads c and writes to c.
+T1 reads b.
+T3 reads b and c and then writes to b.
+T2 commits first, making its changes to a and c visible.
+T1 commits next, with no changes to make visible.
+T3 commits last, making its changes to b visible.
+Under MVCC Repeatable Read, each transaction works with a consistent snapshot of the database as it was at the start of the transaction, ensuring that the schedule is serializable and maintains isolation between transactions.
+
+
+
+
+
+

@@ -1,0 +1,41 @@
+-- Create building table
+CREATE TABLE public.building (
+    building_id serial PRIMARY KEY,
+    building_name varchar(50) NOT NULL
+);
+
+-- Create room table
+CREATE TABLE public.room (
+    room_id serial PRIMARY KEY,
+    building_id integer NOT NULL,
+    room_number varchar(10) NOT NULL,
+    CONSTRAINT fk_building FOREIGN KEY(building_id) REFERENCES public.building(building_id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- Add new columns to lesson table for building and room references
+ALTER TABLE public.lesson
+ADD COLUMN building_id integer,
+ADD COLUMN room_id integer;
+
+-- Add foreign keys for building and room references in the lesson table
+ALTER TABLE public.lesson
+ADD CONSTRAINT fk_building_id FOREIGN KEY(building_id) REFERENCES public.building(building_id) ON UPDATE CASCADE ON DELETE CASCADE,
+ADD CONSTRAINT fk_room_id FOREIGN KEY(room_id) REFERENCES public.room(room_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Ensure that at a specific lesson time, a room in a building can only be assigned to one lesson
+ALTER TABLE public.lesson
+ADD CONSTRAINT unique_lesson_time_room UNIQUE (lesson_time, room_id, building_id);
+
+-- Create the script file
+\echo 'Creating script file...'
+\o /mnt/data/lesson_db_update.sql
+
+-- Write the commands to the script file
+\echo 'Writing to script file...'
+\i '/path/to/your/script.sql'
+
+\o
+
+-- Verify the script file content
+\echo 'Verifying script file content...'
+\! cat /mnt/data/lesson_db_update.sql

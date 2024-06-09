@@ -1,0 +1,140 @@
+When autocommit is on, every SQL command is automatically committed to the database as soon as it is executed. Here’s the detailed step-by-step explanation:
+
+INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+
+This command successfully inserts a row with ID 1 and name 'Miller' and is immediately committed to the database.
+INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+
+This command successfully inserts a row with ID 2 and name 'Neuer' and is immediately committed to the database.
+Begin;
+
+This command starts a new transaction. Changes made after this point are part of this transaction and are not committed until the Commit command is issued.
+INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+
+This command inserts a row with ID 3 and name 'Doe'. Since autocommit is on, this change is part of the current transaction and not yet committed.
+INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+
+This command inserts a row with ID 4 and name 'Smith'. It is also part of the current transaction and not yet committed.
+INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+
+This command tries to insert another row with ID 4 and name 'Summer'. However, it fails because ID 4 already exists, violating the primary key constraint. Due to this failure, the entire transaction is rolled back, and none of the changes made within this transaction are committed.
+Commit;
+
+Since the previous insert failed, the transaction is rolled back, and Commit does not apply any changes from this transaction.
+Thus, the rows in the table after all commands with autocommit on are:
+ID | Name
+---------
+1  | Miller
+2  | Neuer
+Explanation for Question 2: Rows in the table with autocommit off
+When autocommit is off, commands are not committed automatically and must be explicitly committed. Here’s the detailed step-by-step explanation:
+
+INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+
+This command successfully inserts a row with ID 1 and name 'Miller' and must be explicitly committed, but since autocommit is off, it waits for an explicit Commit command.
+INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+
+This command successfully inserts a row with ID 2 and name 'Neuer'. Again, it waits for an explicit Commit command.
+Begin;
+
+This command starts a new transaction. Changes made after this point are part of this transaction and are not committed until the Commit command is issued.
+INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+
+This command inserts a row with ID 3 and name 'Doe'. It is part of the current transaction and not yet committed.
+INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+
+This command inserts a row with ID 4 and name 'Smith'. It is also part of the current transaction and not yet committed.
+INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+
+This command tries to insert another row with ID 4 and name 'Summer'. However, it fails because ID 4 already exists, violating the primary key constraint. Due to this failure, the entire transaction is rolled back, and none of the changes made within this transaction are committed.
+Commit;
+
+Since the previous insert failed, the transaction is rolled back, and Commit does not apply any changes from this transaction.
+ID | Name
+---------
+1  | Miller
+2  | Neuer
+When autocommit is off, every command runs in a transaction that must be explicitly committed. Here’s the correct detailed step-by-step explanation:
+
+Initial State:
+
+The table is empty before running any commands.
+INSERT INTO public.test("ID", name) VALUES (1, 'Miller');
+
+This command starts a transaction and successfully inserts a row with ID 1 and name 'Miller'.
+Pending transaction:
+markdown
+Copy code
+ID | Name
+-----------
+1  | Miller
+INSERT INTO public.test("ID", name) VALUES (2, 'Neuer');
+
+This command successfully inserts a row with ID 2 and name 'Neuer'.
+Pending transaction:
+markdown
+Copy code
+ID | Name
+-----------
+1  | Miller
+2  | Neuer
+Begin;
+
+This command tries to start a new transaction but will issue a warning because a transaction is already running.
+INSERT INTO public.test("ID", name) VALUES (3, 'Doe');
+
+This command inserts a row with ID 3 and name 'Doe'. It is part of the current transaction.
+Pending transaction:
+markdown
+Copy code
+ID | Name
+-----------
+1  | Miller
+2  | Neuer
+3  | Doe
+INSERT INTO public.test("ID", name) VALUES (4, 'Smith');
+
+This command inserts a row with ID 4 and name 'Smith'. It is also part of the current transaction.
+Pending transaction:
+markdown
+Copy code
+ID | Name
+-----------
+1  | Miller
+2  | Neuer
+3  | Doe
+4  | Smith
+INSERT INTO public.test("ID", name) VALUES (4, 'Summer');
+
+This command tries to insert another row with ID 4 and name 'Summer'. However, it fails because ID 4 already exists, violating the primary key constraint. Due to this failure, the entire transaction is rolled back, and none of the changes made within this transaction are committed.
+Pending transaction after rollback:
+markdown
+Copy code
+ID | Name
+-----------
+Commit;
+
+The previous INSERT failed, causing the transaction to be rolled back. Therefore, the Commit command does not apply any changes from the failed transaction.
+Result with autocommit off:
+
+markdown
+Copy code
+ID | Name
+---------
+Summary
+In the scenario with autocommit off, the rows in the table after executing all the commands are:
+
+markdown
+Copy code
+ID | Name
+---------
+The reason is that the initial INSERT commands started a transaction. The subsequent INSERT commands were part of this transaction. When the duplicate ID insertion failed, it caused the entire transaction to roll back, leaving the table empty.
+
+In contrast, with autocommit on, only the successful INSERT commands are committed immediately. Thus, the rows in the table are:
+
+markdown
+Copy code
+ID | Name
+---------
+1  | Miller
+2  | Neuer

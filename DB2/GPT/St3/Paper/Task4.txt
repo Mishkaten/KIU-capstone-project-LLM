@@ -1,0 +1,43 @@
+In PostgreSQL's Serializable Snapshot Isolation (SSI), the system is designed to detect and prevent anomalies such as write skew, which can occur under concurrent transactions. The situation described is a classic example of write skew.
+
+Scenario:
+There are 4 persons on duty: Alice, Bob, Joe, and Susan.
+A minimum of 2 persons need to remain on duty.
+Alice and Bob start concurrent transactions to remove themselves from the duty list.
+Expected Behavior under SSI:
+Transaction 1 (T1): Alice reads the current duty list (Alice, Bob, Joe, Susan).
+Transaction 2 (T2): Bob reads the current duty list (Alice, Bob, Joe, Susan).
+Both transactions proceed to update the duty list, attempting to remove themselves.
+T1 attempts to remove Alice.
+T2 attempts to remove Bob.
+If both transactions commit successfully without any checks, the final duty list could end up with only Joe and Susan, violating the requirement that at least 2 persons remain on duty.
+
+PostgreSQL SSI Mechanism:
+PostgreSQL’s SSI will detect the potential write skew because the read sets (initial duty list) and write sets (updated duty list) of both transactions overlap in a way that can lead to an invalid state.
+
+Steps:
+
+Initial Reads:
+
+T1 reads the duty list: [Alice, Bob, Joe, Susan]
+T2 reads the duty list: [Alice, Bob, Joe, Susan]
+Write Intentions:
+
+T1 intends to write (remove Alice): [Bob, Joe, Susan]
+T2 intends to write (remove Bob): [Alice, Joe, Susan]
+Conflict Detection:
+
+T1 and T2 both depend on the same initial read state ([Alice, Bob, Joe, Susan]).
+Their writes intersect, resulting in a state ([Joe, Susan]) that does not respect the constraint of having at least 2 persons on duty.
+Conflict Resolution:
+PostgreSQL SSI will detect this conflict when T1 or T2 tries to commit.
+One of the transactions will be aborted to prevent the write skew.
+If T1 commits first, T2 will be aborted.
+If T2 commits first, T1 will be aborted.
+This ensures that at least 2 people remain on the duty list, preserving the integrity of the data.
+
+Hypothesis:
+My hypothesis is that PostgreSQL's SSI will prevent both transactions from committing simultaneously. It will detect the potential write skew and abort one of the transactions, ensuring that the constraint of having at least 2 persons on duty is not violated.
+
+Conclusion:
+PostgreSQL’s Serializable Snapshot Isolation (

@@ -1,0 +1,107 @@
+Documents in MongoDB are typically stored in a denormalized form, meaning that data redundancy and embedding related data are common practices. This can lead to violations of normalization concepts that are typically used in relational databases.
+
+Example Document
+Let's assume we have a teacher collection with the following document:
+
+{
+    "_id": ObjectId("60d5f77fbcf86cd799439011"),
+    "name": "John Doe",
+    "department": "Computer Science",
+    "courses": [
+        {
+            "course_id": "CS101",
+            "course_name": "Introduction to Computer Science",
+            "semester": "Fall 2023",
+            "students": [
+                { "student_id": "S001", "name": "Alice Smith" },
+                { "student_id": "S002", "name": "Bob Johnson" }
+            ]
+        },
+        {
+            "course_id": "CS102",
+            "course_name": "Data Structures",
+            "semester": "Spring 2024",
+            "students": [
+                { "student_id": "S003", "name": "Carol White" },
+                { "student_id": "S004", "name": "David Brown" }
+            ]
+        }
+    ],
+    "insertion_time": ISODate("2023-06-03T10:00:00Z")
+}
+
+
+
+
+Normalization Violations
+In a normalized relational database, this document would be split into multiple tables to minimize redundancy and ensure data integrity. Let's identify the normalization concepts violated:
+
+First Normal Form (1NF) Violation:
+
+Violation: The students array inside each courses subdocument.
+Reason: 1NF requires that each column contains atomic values. Arrays are not atomic values.
+Second Normal Form (2NF) Violation:
+
+Violation: The courses array.
+Reason: 2NF requires that all non-key attributes are fully dependent on the primary key. Here, the courses and their details could be in a separate collection, linked by a teacher ID.
+Third Normal Form (3NF) Violation:
+
+Violation: The repetition of student names within the students array inside each course.
+Reason: 3NF requires that all non-key attributes are not only fully functionally dependent on the primary key but also that there is no transitive dependency. The student's name is dependent on the student ID, which should be in a separate collection.
+
+
+Retrieving the Insertion Time
+To retrieve the insertion time of this document, we can use the following MongoDB command:
+
+Retrieving the Insertion Time
+To retrieve the insertion time of this document, we can use the following MongoDB command:
+
+
+Output
+The command will return:
+
+{
+    "insertion_time": ISODate("2023-06-03T10:00:00Z")
+}
+
+
+
+Document and Insertion Time
+Here is the document with the insertion time:
+
+{
+    "_id": ObjectId("60d5f77fbcf86cd799439011"),
+    "name": "John Doe",
+    "department": "Computer Science",
+    "courses": [
+        {
+            "course_id": "CS101",
+            "course_name": "Introduction to Computer Science",
+            "semester": "Fall 2023",
+            "students": [
+                { "student_id": "S001", "name": "Alice Smith" },
+                { "student_id": "S002", "name": "Bob Johnson" }
+            ]
+        },
+        {
+            "course_id": "CS102",
+            "course_name": "Data Structures",
+            "semester": "Spring 2024",
+            "students": [
+                { "student_id": "S003", "name": "Carol White" },
+                { "student_id": "S004", "name": "David Brown" }
+            ]
+        }
+    ],
+    "insertion_time": ISODate("2023-06-03T10:00:00Z")
+}
+
+
+Conclusion
+The document in the teacher collection violates several normalization principles. Specifically, it violates 1NF due to the use of arrays, 2NF because course information could be in a separate collection, and 3NF due to the redundancy of student names within each course. This denormalized structure is common in MongoDB to optimize for read performance and to accommodate flexible schema design.
+
+
+
+
+
+

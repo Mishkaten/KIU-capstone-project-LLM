@@ -1,0 +1,271 @@
+2.1
+
+Given Schedule with Commits:
+Transaction T1	Transaction T2	Transaction T3
+Read a	
+Write a	
+Read b		
+Read c	
+Read b
+Read c
+Write c	
+Write b
+Commit	Commit	Commit
+Step-by-Step Swapping to Order T1 -> T3 -> T2:
+Initial Schedule:
+
+T2: Read a, Write a
+T1: Read b
+T2: Read c
+T3: Read b, Read c
+T2: Write c
+T3: Write b
+T1: Commit
+T2: Commit
+T3: Commit
+Step 1: Move Read b of T1 up before T2 operations
+
+T1: Read b
+T2: Read a, Write a
+T2: Read c
+T3: Read b, Read c
+T2: Write c
+T3: Write b
+T1: Commit
+T2: Commit
+T3: Commit
+Step 2: Move T1's Commit up before T2's Read a
+
+T1: Read b, Commit
+T2: Read a, Write a
+T2: Read c
+T3: Read b, Read c
+T2: Write c
+T3: Write b
+T2: Commit
+T3: Commit
+Step 3: Move T3's operations up after T1 completes
+
+T1: Read b, Commit
+T3: Read b, Read c, Write b, Commit
+T2: Read a, Write a, Read c, Write c, Commit
+Final Schedule:
+T1: Read b, Commit
+T3: Read b, Read c, Write b, Commit
+T2: Read a, Write a, Read c, Write c, Commit
+Final Detailed Sequence:
+T1: Read b
+T1: Commit
+T3: Read b
+T3: Read c
+T3: Write b
+T3: Commit
+T2: Read a
+T2: Write a
+T2: Read c
+T2: Write c
+T2: Commit
+Conclusion:
+The final schedule, including commits, starts with T1, followed by T3, and then T2, making it a serial schedule equivalent to executing T1 first, then T3, and finally T2. This confirms that the given schedule is serializable in the desired order.
+2.2
+
+Strict Two-Phase Locking (Strict 2PL) is a concurrency control method that ensures transactions acquire locks before accessing data and release all locks only after the transaction commits or rolls back. This prevents cascading rollbacks and ensures serializability.
+
+Given the schedule, let's execute it under strict 2PL and determine when transactions can commit or rollback:
+
+Schedule:
+T2: Read a
+T2: Write a
+T1: Read b
+T2: Read c
+T3: Read b
+T3: Read c
+T3: Write b
+T2: Write c
+
+
+Strict 2PL Execution:
+Step-by-Step Execution:
+
+T2: Read a
+
+T2 acquires a read lock on a.
+T2: Write a
+
+T2 upgrades the read lock to a write lock on a.
+T1: Read b
+
+T1 acquires a read lock on b.
+T2: Read c
+
+T2 acquires a read lock on c.
+T3: Read b
+
+T3 waits because T1 holds a read lock on b.
+T3: Read c
+
+T3 waits because T2 holds a read lock on c.
+T3: Write b
+
+T3 waits because T1 holds a read lock on b.
+T2: Write c
+
+T2 upgrades the read lock to a write lock on c.
+
+
+Commit/Rollback:
+
+T2 can now commit because it has finished its operations.
+T2 releases all locks (a, c).
+T3: Read c can proceed because T2 released the lock on c.
+T3 acquires a read lock on c.
+T3: Read b still waits because T1 holds a read lock on b.
+
+Next Steps:
+
+T1: Read b finishes its operation.
+T1 can now commit and releases the lock on b.
+T3: Read b can proceed because T1 released the lock on b.
+T3 acquires a read lock on b.
+T3: Write b can proceed.
+T3 upgrades the read lock to a write lock on b.
+
+Final State:
+
+T3 completes its operations and can now commit.
+T3 releases all locks (b, c).
+
+
+Transaction T1    | Transaction T2    | Transaction T3    | Strict 2PL Execution
+--------------------------------------------------------------------------------
+                   | Read a            |                   | T2: Read a
+                   | Write a           |                   | T2: Write a
+Read b             |                   |                   | T1: Read b
+                   | Read c            |                   | T2: Read c
+                   |                   |                   | T2: Commit (release locks on a, c)
+                   |                   | Read b            | T3: Read b
+                   |                   | Read c            | T3: Read c
+                   |                   | Write b           | T3: Write b
+                   | Write c           |                   | T2: Write c
+                   |                   |                   | T1: Commit (release lock on b)
+                   |                   |                   | T3: Commit (release locks on b, c)
+
+
+Explanation:
+
+T2 performs Read a, Write a, Read c, and Write c, and then commits, releasing all its locks.
+T1 performs Read b and then commits, releasing its lock.
+T3 waits until T1 and T2 release their locks, then performs Read b, Read c, and Write b, and commits, releasing all its locks.
+By adhering to strict 2PL, we ensure that the schedule is serializable and that there are no conflicts due to concurrent access to shared data items.
+
+
+
+2.3
+
+Multi-Version Concurrency Control (MVCC) allows transactions to see a consistent snapshot of the database at the time the transaction started. Under the Repeatable Read isolation level, transactions can see the state of the database as it was at the start of the transaction and no other transaction's modifications until they commit.
+
+Let's analyze the given schedule under MVCC Repeatable Read.
+
+Transaction T1    | Transaction T2    | Transaction T3
+-----------------------------------------------------
+                   | Read a            |
+                   | Write a           |
+Read b             |                   |
+                   | Read c            |
+                   |                   | Read b
+                   |                   | Read c
+                   |                   | Write b
+                   | Write c           |
+
+
+Execution Order Under MVCC Repeatable Read:
+Step-by-Step Execution:
+
+T2: Read a
+
+T2 reads the initial value of a.
+T2: Write a
+
+T2 writes a new value to a. This value is not visible to other transactions until T2 commits.
+T1: Read b
+
+T1 reads the initial value of b.
+T2: Read c
+
+T2 reads the initial value of c.
+T3: Read b
+
+T3 reads the initial value of b (not affected by T1's read).
+T3: Read c
+
+T3 reads the initial value of c.
+T3: Write b
+
+T3 writes a new value to b. This value is not visible to other transactions until T3 commits.
+T2: Write c
+
+T2 writes a new value to c. This value is not visible to other transactions until T2 commits.
+
+
+
+
+Commit/Rollback:
+Transaction Commit Order:
+
+T2 commits:
+
+Changes to a and c are now visible to other transactions.
+T1 commits:
+
+No changes made by T1, so no new visibility issues.
+T3 commits:
+
+Changes to b are now visible to other transactions.
+
+
+
+
+Final State:
+T2: Read a, Write a, Read c, Write c
+
+a and c are updated by T2.
+T1: Read b
+
+b is read by T1 before T3's write to b.
+T3: Read b, Read c, Write b
+
+b and c are read by T3, and b is written by T3.
+
+
+
+Transaction T1    | Transaction T2    | Transaction T3    | MVCC Repeatable Read
+--------------------------------------------------------------------------------
+                   | Read a            |                   | T2: Read a
+                   | Write a           |                   | T2: Write a
+Read b             |                   |                   | T1: Read b
+                   | Read c            |                   | T2: Read c
+                   |                   | Read b            | T3: Read b
+                   |                   | Read c            | T3: Read c
+                   |                   | Write b           | T3: Write b
+                   | Write c           |                   | T2: Write c
+                   |                   |                   | T2: Commit
+                   |                   |                   | T1: Commit
+                   |                   |                   | T3: Commit
+
+
+
+Explanation:
+
+T2 reads a and writes to a. T2 also reads c and writes to c.
+T1 reads b.
+T3 reads b and c and then writes to b.
+T2 commits first, making its changes to a and c visible.
+T1 commits next, with no changes to make visible.
+T3 commits last, making its changes to b visible.
+Under MVCC Repeatable Read, each transaction works with a consistent snapshot of the database as it was at the start of the transaction, ensuring that the schedule is serializable and maintains isolation between transactions.
+
+
+
+
+
+

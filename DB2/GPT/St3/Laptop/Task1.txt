@@ -1,0 +1,61 @@
+Transaction Following Behavior:
+
+The transactions do not follow each other; they are executed concurrently. This means both transactions start and perform operations independently without waiting for the other to complete. This concurrency is essential for testing the behavior of PostgreSQL under Serializable Snapshot Isolation (SSI).
+Which Transaction Rolls Back:
+
+Under SSI, PostgreSQL should detect a write skew when Alice and Bob try to remove themselves from the duty list simultaneously, as it would violate the constraint that at least two persons must remain on duty. As a result, PostgreSQL will roll back one of the transactions. The transaction that rolls back is determined by PostgreSQL's internal conflict detection mechanism. If both transactions commit, it indicates a False Negative. If one transaction commits and the other rolls back, it indicates a True Positive.
+Xmin and Xmax Versions After Commits:
+
+Xmin: This represents the transaction ID of the transaction that inserted or most recently updated the row. After the transactions, the xmin values for the remaining rows will indicate the original transaction that inserted or last updated them.
+Xmax: This represents the transaction ID of the transaction that deleted the row, if applicable. If Alice's transaction commits and Bob's rolls back, the xmax for Alice's row will show the transaction ID of Alice's transaction, indicating she was deleted. If both transactions commit (False Negative), the xmax for both Alice and Bob's rows will show the respective transaction IDs, indicating they were both deleted. If both transactions roll back (True Negative or False Positive), the xmax will remain zero for all rows, indicating no deletions occurred.
+Example Scenarios
+Scenario 1: True Positive
+
+Transaction 1 (Alice):
+Alice attempts to delete herself from the duty list.
+Transaction ID: 5678
+Transaction 2 (Bob):
+Bob attempts to delete himself from the duty list.
+Transaction ID: 5679
+Result: PostgreSQL detects the write skew and rolls back one transaction.
+Alice's transaction commits.
+Bob's transaction rolls back.
+Xmin remains the same for all rows.
+Xmax for Alice's row shows 5678 (indicating deletion by Alice's transaction).
+Scenario 2: False Negative
+
+Transaction 1 (Alice):
+Alice attempts to delete herself from the duty list.
+Transaction ID: 5678
+Transaction 2 (Bob):
+Bob attempts to delete himself from the duty list.
+Transaction ID: 5679
+Result: Both transactions commit, violating the constraint.
+Xmin remains the same for all rows.
+Xmax for Alice's row shows 5678.
+Xmax for Bob's row shows 5679.
+Scenario 3: True Negative
+
+Transaction 1 (Alice):
+Alice attempts to delete herself from the duty list.
+Transaction ID: 5678
+Transaction 2 (Bob):
+Bob attempts to delete himself from the duty list.
+Transaction ID: 5679
+Result: Both transactions fail, maintaining the constraint.
+Xmin and Xmax remain the same for all rows.
+Scenario 4: False Positive
+
+Transaction 1 (Alice):
+Alice attempts to delete herself from the duty list.
+Transaction ID: 5678
+Transaction 2 (Bob):
+Bob attempts to delete himself from the duty list.
+Transaction ID: 5679
+Result: Both transactions roll back unnecessarily.
+Xmin and Xmax remain the same for all rows.
+Conclusion
+PostgreSQL's Serializable Snapshot Isolation (SSI) should prevent both transactions from committing simultaneously if it would violate the constraint.
+The correct behavior is to have one transaction commit and the other roll back (True Positive).
+Observing the xmin and xmax values after the transactions provides insights into which rows were affected and by which transactions.
+In practice, running these transactions concurrently in PostgreSQL would show whether the system correctly detects and handles the write skew, ensuring database consistency.

@@ -1,0 +1,31 @@
+3.1
+
+The Solution for 3.1 According to the Text
+Explanation: When a new transaction 
+n
++
+1
+n+1 requests a shared lock (S-lock) on an object, it will only be involved in the waits-for-graph if another transaction already holds an exclusive lock (X-lock) on that object. Since only one transaction can hold an X-lock on any object at any time, the new transaction will wait for that single transaction.
+
+Number of new edges added to the waits-for-graph:
+The new transaction will wait for exactly one transaction holding the X-lock, adding 1 new edge to the waits-for-graph.
+
+Therefore, the solution for 3.1 is that the maximum number of new edges that will be added to the waits-for-graph when a new transaction (
+n
++
+1
+n+1) requests an S-lock is 1.
+
+Summary
+3.1: The new transaction (
+n
++
+1
+n+1) requesting a S-lock will add 1 new edge to the waits-for-graph.
+3.2: The new transaction requesting an X-lock will add n new edges to the waits-for-graph.
+
+
+
+
+
+

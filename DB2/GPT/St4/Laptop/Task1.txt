@@ -1,0 +1,95 @@
+PostgreSQL's Serializable Snapshot Isolation (SSI) mechanism is designed to detect serialization anomalies such as write skew and will throw a serialization failure error if it detects that committing both transactions would lead to an inconsistent state.
+
+Explanation of SSI Behavior
+In the scenario where Alice and Bob try to remove themselves from the duty list concurrently, PostgreSQL should behave as follows:
+
+Concurrent Transactions:
+
+Both Alice and Bob start transactions in SERIALIZABLE isolation level.
+Each transaction checks the current duty list and attempts to delete a row (Alice for herself and Bob for himself).
+Conflict Detection:
+
+PostgreSQL's SSI mechanism tracks read and write dependencies between transactions.
+When Alice and Bob attempt to delete their rows, PostgreSQL detects that allowing both transactions to commit would violate the rule that at least two persons must remain on duty.
+Serialization Error:
+
+To prevent this inconsistency, PostgreSQL will throw a serialization failure error (SQLSTATE 40001) for one of the transactions.
+This error indicates that the transaction must be retried because it cannot be serialized with the other concurrent transaction.
+Practical Demonstration
+To verify this behavior, you can run the example in two PostgreSQL sessions:
+
+Session 1 (Alice's Transaction):
+sql
+Copy code
+-- Open a new terminal or session
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Check the current duty list
+SELECT * FROM duty_list;
+
+-- Alice tries to get off the duty list
+DELETE FROM duty_list WHERE person_name = 'Alice';
+
+-- Attempt to commit the transaction
+COMMIT;
+Session 2 (Bob's Transaction):
+sql
+Copy code
+-- Open another terminal or session
+BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Check the current duty list
+SELECT * FROM duty_list;
+
+-- Bob tries to get off the duty list
+DELETE FROM duty_list WHERE person_name = 'Bob';
+
+-- Attempt to commit the transaction
+COMMIT;
+Expected Output
+Session 1 (Alice):
+
+The transaction will likely succeed and commit without issues if it runs first or PostgreSQL detects no immediate conflict.
+Session 2 (Bob):
+
+When Bob tries to commit his transaction, PostgreSQL will detect that committing this transaction would result in fewer than two persons on duty.
+As a result, PostgreSQL will throw a serialization failure error for Bob's transaction:
+plaintext
+Copy code
+ERROR:  could not serialize access due to read/write dependencies among transactions
+DETAIL:  Reason code: Canceled on identification as a pivot, during commit attempt.
+HINT:  The transaction might succeed if retried.
+Xmin and Xmax Versions After Commits
+Xmin: This remains the same for the unaffected rows, indicating the transaction ID that originally created or modified the row.
+Xmax: For the deleted row (if Alice's transaction commits), xmax will show the transaction ID that deleted the row.
+Summary of Observations
+True Positive: PostgreSQL correctly detects the conflict and throws a serialization error for one of the transactions.
+False Negative: Both transactions commit, leading to an inconsistent state (unlikely under correct SSI implementation).
+True Negative: Both transactions fail if neither can proceed without causing a conflict (rare in this context).
+False Positive: Both transactions roll back unnecessarily (unlikely).
+Conclusion
+PostgreSQL's SSI will indeed throw a serialization error to prevent both transactions from committing and violating the constraint. This error forces one of the transactions to roll back and be retried, ensuring the consistency of the database.
+Conclusion
+In the scenario where Alice and Bob attempt to remove themselves from the duty list concurrently, and focusing on the xmin and xmax values after the first transaction commits:
+
+PostgreSQL's Behavior:
+
+PostgreSQL's Serializable Snapshot Isolation (SSI) will detect the potential write skew and prevent both transactions from committing if they would violate the constraint of having at least two persons on duty.
+If one transaction commits first, the second transaction will be rolled back with a serialization error to maintain data consistency.
+Which Transaction Gets Rolled Back:
+
+The transaction that gets rolled back is not deterministic and depends on the order and timing of the commits.
+If Alice's transaction commits first, Bob's transaction will be rolled back, and vice versa.
+xmin and xmax Values:
+
+After Alice's transaction commits:
+Alice's Row:
+xmin remains the same as the original inserting transaction ID (e.g., 1000).
+xmax is updated to the transaction ID that deleted the row (e.g., 2001).
+Other Rows (Bob, Joe, Susan):
+xmin remains as the original inserting transaction ID (e.g., 1000).
+xmax remains 0 (indicating these rows are still valid and not deleted).
+Post-Commit Row Versions:
+
+The xmin and xmax of the first transaction update (Alice's transaction) will accurately reflect the new valid row version after the commit, showing the transaction ID that deleted the row (xmax).
+By carefully observing the xmin and xmax values, one can verify the changes and ensure that the database maintains consistency according to the isolation level constraints.
