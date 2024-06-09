@@ -1,0 +1,21 @@
+3.1 Maximum New Edges for S-Lock Request
+Scenario: A new transaction (let's call it T_new) requests a shared (S) lock on an object.
+Analysis:
+	•	Under strict 2PL, a transaction requesting an S-lock can only be blocked by a transaction currently holding an exclusive (X) lock on the same object.
+	•	Since only one transaction can hold an X-lock at a time, there can be at most one transaction blocking T_new's request.
+Conclusion:
+	•	The maximum number of new edges added to the waits-for graph is 1. This new edge would be directed from T_new to the transaction currently holding the X-lock.
+3.2 Maximum New Edges for X-Lock Request
+Scenario: A new transaction (T_new) requests an exclusive (X) lock on an object.
+Analysis:
+	•	A transaction requesting an X-lock can be blocked by:
+	◦	The transaction currently holding the X-lock (if any).
+	◦	Any transactions currently holding S-locks on the same object.
+	•	Since only one transaction can hold the X-lock, there will be at most one edge from T_new to the X-lock holder.
+	•	Let's say there are 'n' transactions currently holding S-locks on the object. Each of these transactions can block T_new, leading to 'n' additional edges in the waits-for graph.
+Conclusion:
+	•	The maximum number of new edges added to the waits-for graph is n + 1, where 'n' is the number of transactions holding S-locks on the object.
+Key Points:
+	•	The restriction of a single X-lock holder per object significantly simplifies the analysis.
+	•	For S-lock requests, there can be at most one blocking transaction.
+	•	For X-lock requests, the maximum number of blocking transactions includes the X-lock holder and all S-lock holders.
