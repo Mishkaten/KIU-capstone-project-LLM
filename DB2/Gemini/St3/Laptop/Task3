@@ -1,0 +1,40 @@
+Example Teacher Document (De-normalized):
+JSON
+{
+    "_id": ObjectId("64869b3159669d1694387c85"),
+    "name": "John Doe",
+    "age": 35,
+    "courses": [
+        { "name": "Mathematics", "department": "Science" },
+        { "name": "Physics", "department": "Science" }
+    ],
+    "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "zipcode": "12345"
+    }
+}
+Normalization Violations:
+	•	1NF (First Normal Form) Violation: The courses array violates 1NF. Each element in the array contains multiple attributes (name and department). In a normalized structure, this information would be in a separate table linked by a foreign key.
+	•	2NF (Second Normal Form) Violation:  If there were multiple teachers teaching the same course, the course's department information within each teacher's document would violate 2NF.  The department depends on the course, not the teacher. In a normalized model, you'd have a separate "Courses" table with name and department.
+	•	3NF (Third Normal Form) Violation: The address field could violate 3NF if attributes like city and zipcode depend solely on the street attribute. In a normalized design, you might have a separate Addresses table with these attributes linked by a foreign key.
+Retrieving Insertion Time
+In MongoDB, documents automatically get a timestamp when they're inserted. This timestamp is stored in the ObjectId itself. You can extract it using the following steps:
+	1	Get the ObjectId: Obtain the _id of your document (e.g., from a query).
+	2	Extract the Timestamp:
+	◦	MongoDB Shell: Use the getTimestamp() method on the ObjectId: JavaScript ObjectId("64869b3159669d1694387c85").getTimestamp()
+	◦	   Use code with caution.  content_copy   
+	◦	Programming Languages: Most MongoDB drivers provide functions to extract the timestamp from an ObjectId.
+Inclusion in Solution File
+You would typically present your solution as follows:
+**Document:**
+
+{ ... (the JSON document shown above) }
+
+**Insertion Time:**
+
+2023-06-10T12:31:29.000Z 
+Explanation:
+The insertion time indicates the document was created on June 10th, 2023, at 12:31:29 UTC.
+Important Note:
+The provided example assumes that your teacher collection has a document structure similar to the one shown. The specific normalization violations and insertion time retrieval might differ slightly based on the actual structure of your data.
