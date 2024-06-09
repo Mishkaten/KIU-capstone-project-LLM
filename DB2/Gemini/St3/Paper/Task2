@@ -1,0 +1,157 @@
+2.1
+The initial schedule is:
+T1     | T2     | T3
+-------|-------|-------
+       |Read a  |
+       |Write a |
+Read b |       |
+       |Read c |
+       |       |Read b
+       |       |Read c
+       |Write c|
+       |       |Write b
+To determine if it's serializable, we can try swapping operations.
+	1	Swap Read c (T2) and Read b (T3): This is allowed as they are non-conflicting operations. The schedule becomes:
+T1     | T2     | T3
+-------|-------|-------
+       |Read a  |       
+       |Write a |       
+Read b |Read c |       
+       |       |Read b
+       |       |Read c
+       |Write c|       
+       |       |Write b
+	2	Swap Read c (T2) and Read c (T3): This is allowed as they are non-conflicting operations. The schedule becomes:
+T1     | T2     | T3
+-------|-------|-------
+       |Read a  |
+       |Write a |
+Read b |       |
+       |Read c |Read b
+       |       |Read c
+       |Write c|
+       |       |Write b
+	3	Swap Read c (T2) and Write c (T2): This is not allowed as they are conflicting operations (both from T2 and operate on the same data item 'c').
+We cannot proceed further with swapping, and the resulting schedule is not a serial schedule. Therefore, the original schedule is not serializable.
+2.2
+Transaction
+T1
+T2
+T3
+Strict 2PL (Locks/Unlocks)
+
+
+Read a (S)
+
+
+
+
+Write a (X)
+
+
+
+Read b (S)
+
+
+
+
+
+Read c (S)
+Read b (S)
+
+
+
+
+Read c (S)
+
+
+
+Write c (X)
+
+T2 releases all locks (a, c) (Commit/Unlock)
+
+
+
+Write b (X)
+
+
+Write c (X)
+
+
+
+
+T1 releases all locks (b, c) (Commit/Unlock)
+
+T3 releases all locks (b, c) (Commit/Unlock)
+drive_spreadsheetExport to Sheets
+Key:
+	•	S: Shared Lock (Allows multiple transactions to read but not write)
+	•	X: Exclusive Lock (Allows only one transaction to read and write)
+Explanation:
+	1	T2:
+	◦	Acquires a shared lock on 'a' to read it.
+	◦	Upgrades to an exclusive lock on 'a' to write it.
+	◦	Acquires a shared lock on 'c' to read it.
+	◦	Acquires an exclusive lock on 'c' to write it.
+	◦	Commits and releases all locks on 'a' and 'c'.
+	2	T1:
+	◦	Acquires a shared lock on 'b' to read it.
+	◦	Acquires an exclusive lock on 'c' to write it (waits for T2 to release the lock on 'c').
+	◦	Commits and releases all locks on 'b' and 'c'.
+	3	T3:
+	◦	Acquires a shared lock on 'b' to read it (waits for T1 to release the lock on 'b').
+	◦	Acquires a shared lock on 'c' to read it.
+	◦	Acquires an exclusive lock on 'b' to write it.
+	◦	Commits and releases all locks on 'b' and 'c'.
+Strict 2PL ensures serializability by preventing conflicts and guaranteeing that the schedule is equivalent to a serial execution of the transactions.
+2.3
+Transaction
+T1
+T2
+T3
+MVCC Repeatable Read
+
+
+Read a (v1)
+
+T2 reads the initial version of 'a' (v1)
+
+
+Write a (v2)
+
+T2 creates a new version of 'a' (v2) and commits immediately
+
+Read b (v1)
+
+
+T1 reads the initial version of 'b' (v1)
+
+
+Read c (v1)
+Read b (v1)
+T2 reads the initial version of 'c' (v1), T3 reads the initial version of 'b' (v1)
+
+
+Write c (v2)
+Read c (v1)
+T2 creates a new version of 'c' (v2) and commits immediately. T3 reads the initial version of 'c' (v1) because it started before T2's commit, ensuring repeatable reads.
+
+Write c (v3)
+
+Write b (v2)
+T1 creates a new version of 'c' (v3) and commits immediately. T3 creates a new version of 'b' (v2) and commits immediately
+
+drive_spreadsheet
+Export to Sheets
+
+
+
+Key Points:
+	•	MVCC: Each transaction reads and writes its own consistent snapshot of the database.
+	•	Versions: New versions are created when a transaction writes to a data item.
+	•	Repeatable Read: Each transaction sees the same versions of data throughout its execution, even if other transactions commit changes in the meantime.
+	•	Commit/Rollback: Transactions commit as soon as possible, releasing their locks and making their changes visible to other transactions.
+Explanation:
+	1	T2: Reads the initial version of 'a' (v1), then creates a new version (v2) and commits. It then reads the initial version of 'c' (v1) and creates a new version (v2), committing again.
+	2	T1: Reads the initial version of 'b' (v1), then creates a new version of 'c' (v3) because it doesn't see T2's changes yet (repeatable read) and commits.
+	3	T3: Reads the initial versions of 'b' (v1) and 'c' (v1) for the same reason as T1, then creates a new version of 'b' (v2) and commits.
