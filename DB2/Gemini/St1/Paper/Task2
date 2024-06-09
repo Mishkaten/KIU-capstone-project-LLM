@@ -1,0 +1,240 @@
+
+2.1
+Absolutely! Here's how we can approach the problem of determining if the schedule is serializable using the operation swap method:
+Understanding the Operation Swap Method
+The goal of the operation swap method is to see if we can transform the given schedule into a serial schedule (where transactions execute one after the other without interleaving) by swapping adjacent operations. If we can achieve a serial schedule through swaps, the original schedule is considered serializable.
+Applying the Method
+Let's analyze the schedule and try to swap operations:
+	1	Initial Schedule:
+Transaction T1
+Transaction T2
+Transaction T3
+
+Read a
+
+
+Write a
+
+Read b
+
+
+
+Read c
+
+
+
+Read b
+
+
+Read c
+
+Write c
+
+
+
+Write b
+drive_spreadsheetExport to Sheets
+	2	Swapping to Isolate T2:
+Notice that T2's operations are already in a sequence. Let's try to swap other operations to isolate T2 further:
+	•	Swap T1's Read b with T2's Read c: This is allowed since they don't conflict (different data items).
+Transaction T1
+Transaction T2
+Transaction T3
+
+Read a
+
+
+Write a
+
+
+Read c
+
+Read b
+
+
+
+
+Read b
+
+
+Read c
+
+Write c
+
+
+
+Write b
+drive_spreadsheetExport to Sheets
+Now T2's operations are completely isolated.
+	3	Swapping to Isolate T1 or T3:
+Let's try to isolate T1:
+	•	Swap T1's Read b with T3's Read b: This is allowed.
+Transaction T1
+Transaction T2
+Transaction T3
+
+Read a
+
+
+Write a
+
+
+Read c
+
+
+
+Read b
+Read b
+
+
+
+
+Read c
+
+Write c
+
+
+
+Write b
+drive_spreadsheetExport to Sheets
+Now T1 and T2 are isolated. We cannot further isolate T3, but that's okay since it doesn't conflict with the isolated T1 and T2.
+Conclusion:
+We've successfully transformed the original schedule into a serial schedule (T2 followed by T1 followed by T3).
+Therefore, the original schedule is serializable.
+2.2
+Strict 2PL Rules:
+	1	Growing Phase: A transaction can acquire locks (shared or exclusive) but cannot release any locks.
+	2	Shrinking Phase: A transaction can release locks but cannot acquire any new locks.
+Execution with Early Commit/Rollback:
+Transaction T1
+Transaction T2
+Transaction T3
+Strict 2PL
+Explanation
+
+Read a
+
+T2 acquires X(a) lock
+T2 gets an exclusive lock on 'a' as it's going to write it.
+
+Write a
+
+
+T2 writes 'a' since it holds the exclusive lock.
+Read b
+
+
+T1 acquires S(b) lock
+T1 gets a shared lock on 'b' as it's only reading it.
+
+Read c
+
+T2 acquires S(c) lock
+T2 gets a shared lock on 'c' as it's only reading it. T2 can now commit/release locks (X(a), S(c)) as it won't request further locks.
+
+
+Read b
+T3 acquires S(b) lock
+T3 gets a shared lock on 'b'.
+
+
+Read c
+T3 cannot acquire S(c) lock (blocked by T2)
+T3 tries to read 'c' but is blocked since T2 holds a lock on it.
+
+Write c
+
+T2 rolls back due to the lock conflict with T3
+Since T2 has already committed, it cannot rollback. This results in a deadlock. To resolve it, T2 is chosen as the victim and rolled back (a practical choice as it has fewer operations than T1). All its changes are undone, and its locks are released. T3 can now acquire the S(c) lock.
+
+
+Write b
+T3 acquires X(b) lock (upgrades from S(b))
+T3 upgrades its shared lock on 'b' to an exclusive lock since it's about to write.
+
+
+Write c
+
+T3 writes 'c' as it holds the exclusive lock. T3 can now commit/release its locks (X(b), S(c)).
+Write c
+
+
+T1 acquires X(c) lock (upgrades from S(c))
+T1 wants to write 'c'. Since T2 was rolled back, the lock on 'c' is no longer held by anyone, and T1 can acquire it. (In a real DBMS, T1 might wait for a while to see if T2 releases the lock before the rollback is initiated).
+
+
+
+T1 can now commit/release its locks (X(c), S(b)).
+T1 has completed its operations and releases its locks.
+drive_spreadsheetExport to Sheets
+Key Points:
+	•	Strict 2PL ensures conflict serializability but can lead to deadlocks.
+	•	Early commits/rollbacks release locks sooner, potentially reducing blocking but not eliminating deadlocks.
+2.3
+MVCC Repeatable Read Rules:
+	1	Read: Transactions read the most recent committed version of data that existed before the transaction started. This ensures that even if other transactions modify the data, the reading transaction will see a consistent snapshot.
+	2	Write: Transactions create a new version of the data. This new version is not visible to other transactions until the writing transaction commits.
+	3	Commit: The transaction's changes (new data versions) are made visible to other transactions.
+	4	Rollback: Any changes made by the transaction are discarded, and the data reverts to its previous state.
+Execution Table:
+Transaction T1
+Transaction T2
+Transaction T3
+MVCC Repeatable Read
+Explanation
+
+Read a
+
+T2 reads a (version 1)
+T2 reads the initial version of 'a'
+
+Write a
+
+T2 writes a (version 2)
+T2 creates a new version of 'a' but it's not yet visible to other transactions.
+Read b
+
+
+T1 reads b (version 1)
+T1 reads the initial version of 'b'. T1 could commit here, but we are trying to commit as early as possible.
+
+Read c
+
+T2 reads c (version 1)
+T2 reads the initial version of 'c'. T2 can commit now as it has completed its reads and writes.
+
+
+Read b
+T3 reads b (version 1)
+T3 reads the initial version of 'b', not the one written by T2 (version 2) because T2 has already committed.
+
+
+Read c
+T3 reads c (version 1)
+T3 reads the initial version of 'c'. T3 could commit here, but we are trying to commit as early as possible.
+
+Write c
+
+T2's write is ignored (MVCC)
+Since T2 has already committed, its attempt to overwrite the current version of 'c' is ignored under Repeatable Read. T1's transaction still holds the 'old' view of the data.
+
+
+Write b
+T3 writes b (version 2)
+T3 creates a new version of 'b'.
+Write c
+
+
+T1 writes c (version 3)
+T1 creates a new version of 'c'. T1 can now commit.
+
+
+
+T3 writes b (version 2) (ignored, already written)
+This write by T3 is technically redundant as it's writing the same value it already wrote. In an actual system, this might be optimized away. T3 can now commit since it has completed its operations and there are no conflicts.
+drive_spreadsheetExport to Sheets
+Key Points:
+	•	MVCC Repeatable Read prevents dirty reads, non-repeatable reads, and phantom reads.
+	•	Each transaction sees a consistent snapshot of the database as it existed at the start of the transaction.
+	•	Early commits/rollbacks are possible as long as the isolation level's guarantees are maintained.
+
