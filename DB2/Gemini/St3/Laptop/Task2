@@ -1,0 +1,63 @@
+Database Schema Design
+We'll need the following tables to represent the relationships and constraints described:
+	•	Building:
+	◦	BuildingID (Primary Key)
+	◦	Name (Other attribute, e.g., "Main Building," "Annex")
+	•	Room:
+	◦	RoomID (Primary Key)
+	◦	BuildingID (Foreign Key referencing Building)
+	◦	Name (Other attribute, e.g., "Room 101")
+	•	Lesson:
+	◦	LessonID (Primary Key)
+	◦	TeacherID (Foreign Key, potentially to a Teacher table)
+	◦	StudentID (Foreign Key, potentially to a Student table)
+	◦	Timeslot (Could be a specific date/time or a reference to a timeslot table)
+To enforce the constraint of one lesson per room per timeslot, we'll introduce a new table:
+	•	LessonSchedule:
+	◦	LessonID (Foreign Key referencing Lesson)
+	◦	RoomID (Foreign Key referencing Room)
+	◦	Timeslot
+	◦	Unique constraint on (RoomID, Timeslot)
+Rationale
+	•	LessonSchedule: This table acts as an associative entity, linking lessons to rooms and timeslots. The unique constraint ensures that a room can't be double-booked for the same timeslot.
+	•	Composite Key: The LessonSchedule table doesn't need its own surrogate primary key (ScheduleID). The combination of LessonID, RoomID, and Timeslot uniquely identifies a scheduled lesson.
+SQL Script
+SQL
+-- Building
+CREATE TABLE Building (
+    BuildingID SERIAL PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+);
+
+-- Room
+CREATE TABLE Room (
+    RoomID SERIAL PRIMARY KEY,
+    BuildingID INT REFERENCES Building(BuildingID) ON DELETE CASCADE,
+    Name VARCHAR(20) NOT NULL
+);
+
+-- Lesson (Assuming Teacher and Student tables exist)
+CREATE TABLE Lesson (
+    LessonID SERIAL PRIMARY KEY,
+    TeacherID INT REFERENCES Teacher(TeacherID) ON DELETE RESTRICT, -- Adjust if needed
+    StudentID INT REFERENCES Student(StudentID) ON DELETE RESTRICT, -- Adjust if needed
+    Timeslot TIMESTAMP NOT NULL
+);
+
+-- LessonSchedule
+CREATE TABLE LessonSchedule (
+    LessonID INT REFERENCES Lesson(LessonID) ON DELETE CASCADE,
+    RoomID INT REFERENCES Room(RoomID) ON DELETE CASCADE,
+    Timeslot TIMESTAMP NOT NULL,
+    UNIQUE (RoomID, Timeslot)
+);
+Use code with caution.
+
+content_copy
+
+
+Key Considerations
+	•	Weak Entities: The Room entity is weak because it depends on the existence of a Building. This is represented by the foreign key relationship and the ON DELETE CASCADE constraint, which means if a building is deleted, its associated rooms are also deleted.
+	•	PK/FK: Primary keys (PKs) are underlined, and foreign keys (FKs) are indicated by the REFERENCES clause.
+	•	Composite Key: The LessonSchedule table demonstrates the use of a composite key.
+	•	Data Types: I've assumed the Timeslot is a TIMESTAMP for flexibility. You might choose a more specific data type if your application has stricter requirements.
