@@ -1,0 +1,64 @@
+Understanding Denormalization in MongoDB
+MongoDB, as a NoSQL database, prioritizes flexibility and performance over strict normalization. Denormalization is common, meaning data that would be separated into multiple tables in a relational database is often nested within a single document in MongoDB.
+Example Teacher Document
+Let's assume we have a teacher document in a MongoDB collection:
+JSON
+{
+    "_id": ObjectId("6486631fa078f41286b398c6"),
+    "name": "John Doe",
+    "subjects": ["Math", "Physics"],
+    "classes": [
+        {
+            "name": "Algebra 101",
+            "students": ["Alice", "Bob", "Charlie"]
+        },
+        {
+            "name": "Physics Fundamentals",
+            "students": ["David", "Emma", "Frank"]
+        }
+    ]
+}
+Use code with caution.
+content_copy
+Normalization Concepts Violated
+	1	Atomicity (1NF): The subjects array violates 1NF. Ideally, each subject should be a separate record in a "subjects" table.
+	2	Second Normal Form (2NF): The nested classes array, especially the students within it, violates 2NF. Student data should be in a separate "students" table, with a foreign key relationship to the "classes" table.
+Retrieving Insertion Time
+MongoDB automatically adds a _id field to each document upon insertion. This _id is an ObjectId object that contains a timestamp component. We can extract the timestamp to get the insertion time.
+Solution (JavaScript Example with MongoDB Node.js Driver)
+JavaScript
+const { MongoClient, ObjectId } = require('mongodb');
+
+async function main() {
+    const client = new MongoClient('mongodb://localhost:27017');
+    await client.connect();
+    const db = client.db('school'); // Assuming 'school' is your database
+
+    const teacherCollection = db.collection('teachers');
+
+    const teacher = await teacherCollection.findOne();
+    if (teacher) {
+        const insertionTime = new Date(teacher._id.getTimestamp());
+
+        console.log("Teacher Document:");
+        console.log(teacher);
+
+        console.log("\nInsertion Time:");
+        console.log(insertionTime);
+    }
+
+    await client.close();
+}
+
+main();
+Use code with caution.
+content_copy
+Explanation:
+	1	Connect: Connect to your MongoDB database.
+	2	Query: Fetch a single teacher document using findOne().
+	3	Get Timestamp: Extract the timestamp from the _id's ObjectId.
+	4	Display: Print the teacher document and its insertion time.
+Key Points
+	•	MongoDB's flexibility allows for denormalization, which can improve read performance.
+	•	Denormalization can introduce data redundancy and potential update anomalies.
+	•	The _id field provides a convenient way to track document insertion time.
