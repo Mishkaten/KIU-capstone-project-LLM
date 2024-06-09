@@ -1,0 +1,28 @@
+When autocommit is on, each statement is treated as a separate transaction. This means:
+	•	The first two INSERT statements will be committed immediately, adding rows (1, 'Miller') and (2, 'Neuer') to the table.
+	•	The BEGIN statement starts a new transaction.
+	•	The three INSERT statements within the transaction will be executed, but the changes are not yet committed.
+	•	The COMMIT statement commits the transaction, adding rows (3, 'Doe'), (4, 'Smith'), and (4, 'Summer') to the table.
+However, since the table has a primary key constraint on the ID column, the last INSERT statement (4, 'Summer') will fail due to a duplicate key error.
+Therefore, with autocommit on, the table will contain the following rows:
+ID
+name
+1
+Miller
+2
+Neuer
+3
+Doe
+4
+Smith
+drive_spreadsheetExport to Sheets
+2. Autocommit off (Bonus):
+When autocommit is off, all statements within a transaction are treated as a single unit. This means:
+	•	The first two INSERT statements will be executed but not committed.
+	•	The BEGIN statement explicitly starts a new transaction.
+	•	The three INSERT statements within the transaction will be executed, but the changes are not yet committed.
+	•	The COMMIT statement commits the entire transaction, adding all five rows to the table.
+Similar to the previous scenario, the last INSERT statement (4, 'Summer') will fail due to the primary key constraint. However, since the transaction is not committed, the entire transaction is rolled back.
+Therefore, with autocommit off, the table will remain empty.
+Final Answer:
+Autocommit ON: (1, 'Miller'), (2, 'Neuer'), (3, 'Doe'), (4, 'Smith') Autocommit OFF: (Table is Empty)
